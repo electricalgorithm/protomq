@@ -1,0 +1,5 @@
+{
+    "concurrent_connections": 100,
+    "latency_p50_ms": 0.16229199536610395,
+    "latency_p99_ms": 0.2430829918012023
+}
