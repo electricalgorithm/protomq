@@ -1,0 +1,34 @@
+# Zig build artifacts
+zig-cache/
+zig-out/
+.zig-cache/
+
+# Build outputs
+*.o
+*.a
+*.so
+*.dylib
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test outputs
+test-results/
+coverage/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# Dependency cache
+deps/
+vendor/

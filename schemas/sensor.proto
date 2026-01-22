@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package iot.sensor;
+
+message SensorData {
+    string device_id = 1;
+    float temperature = 2;
+    float humidity = 3;
+    uint64 timestamp = 4;
+}
+
+message StatusUpdate {
+    string device_id = 1;
+    string status = 2;
+}
