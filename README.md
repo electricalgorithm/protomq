@@ -51,11 +51,11 @@ For the initial release, we support:
 
 ### Performance Results
 
-Verified metrics with 100 concurrent clients on Apple M2 (macOS):
+Verified metrics with 100 concurrent clients on Apple M2 Pro (macOS) and Raspberry Pi 5 (Linux):
 
 - **Concurrency**: 100+ concurrent connections verified.
-- **Latency (p99)**: < 0.3ms (Measured 0.24ms).
-- **Memory Footprint**: ~2.4 MB for 100 clients.
+- **Latency (p99)**: < 0.3ms (Measured 0.24ms for MacOS and 0.17ms for Linux).
+- **Memory Footprint**: < 2.4 MB for 100 clients (Measured 2.41 MB for MacOS and 2.00 MB for Linux).
 
 For detailed methodology and full results, see [RESULTS.md](benchmarks/RESULTS.md).
 

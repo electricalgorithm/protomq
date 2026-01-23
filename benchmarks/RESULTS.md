@@ -3,8 +3,16 @@
 This document records the verified performance metrics of the ProtoMQ Server.
 
 ## Environment
+
+Mac OS:
 - **CPU**: Apple M2 Pro
 - **OS**: macOS 26.2 Darwin Kernel 25.2.0 (Using kqueue)
+- **Zig Version**: 0.15.2
+- **Test Date**: 2026-01-23
+
+Linux:
+- **CPU**: ARM Cortex-A76 (Raspberry Pi 5)
+- **OS**: Debian 1:6.6.62-1+rpt1 (2024-11-25) aarch64 6.6.62+rpt-rpi-2712 
 - **Zig Version**: 0.15.2
 - **Test Date**: 2026-01-23
 
@@ -17,12 +25,21 @@ Benchmarks were performed using the Python script provided in `benchmarks/mqtt_b
 
 ## Verified Results
 
+### Mac OS
 | Metric | Result |
 |--------|--------|
 | Concurrent Connections | **100** |
 | p50 Latency | **0.16ms** |
 | p99 Latency | **0.24ms** |
 | Memory Usage (100 Clients) | **2.41 MB** |
+
+### Linux
+| Metric | Result |
+|--------|--------|
+| Concurrent Connections | **100** |
+| p50 Latency | **0.12ms** |
+| p99 Latency | **0.17ms** |
+| Memory Usage (100 Clients) | **2.00 MB** |
 
 ## Reproducing the Results
 1. Start the server:

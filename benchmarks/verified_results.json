@@ -1,5 +1,16 @@
-{
-    "concurrent_connections": 100,
-    "latency_p50_ms": 0.16229199536610395,
-    "latency_p99_ms": 0.2430829918012023
-}
+[
+    {
+        "platform": "macos",
+        "concurrent_connections": 100,
+        "latency_p50_ms": 0.16229199536610395,
+        "latency_p99_ms": 0.2430829918012023,
+        "memory_usage_mb": 2.41
+    },
+    {
+        "platform": "linux",
+        "concurrent_connections": 100,
+        "latency_p50_ms": 0.1203700085170567,
+        "latency_p99_ms": 0.1720380096230656,
+        "memory_usage_mb": 2.00
+    }
+]
