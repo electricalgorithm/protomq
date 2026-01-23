@@ -1,4 +1,5 @@
-# ProtoMQ
+
+<h1 align="center">ProtoMQ</h1>
 
 <p align="center">
   <img src="assets/mascot.png" alt="ProtoMQ Mascot" width="300px" />
