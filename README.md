@@ -19,7 +19,7 @@
 
 ### Building
 
-One have to have Zig 0.15.2 or later installed. One can download it from [here](https://ziglang.org/download/).
+One have to have Zig 0.15.2 or later installed. Please download it from [here](https://ziglang.org/download/).
 
 ```bash
 # Build server and client
