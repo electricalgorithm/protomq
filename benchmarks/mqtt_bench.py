@@ -111,7 +111,7 @@ async def benchmark_concurrency(target_clients=100):
     
     server_pid = None
     for proc in psutil.process_iter(['name']):
-        if proc.info['name'] == 'mqtt-server':
+        if proc.info['name'] == 'protomq-server':
             server_pid = proc.pid
             break
     
@@ -120,7 +120,7 @@ async def benchmark_concurrency(target_clients=100):
         mem_info = process.memory_info()
         print(f"Server RSS Memory: {mem_info.rss / 1024 / 1024:.2f} MB")
     else:
-        print("Could not find mqtt-server process for memory measurement.")
+        print("Could not find protomq process for memory measurement.")
 
     # Keep alive for a bit
     await asyncio.sleep(2)
