@@ -1,0 +1,30 @@
+[project]
+name = "protomq-bench-suite"
+version = "0.1.0"
+description = "ProtoMQ benchmark suite scripts"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+protomq-bench-b1 = "b1_baseline_concurrency.benchmark:main"
+protomq-bench-b2 = "b2_thundering_herd.benchmark:main"
+protomq-bench-b3 = "b3_sustained_throughput.benchmark:main"
+protomq-bench-b4 = "b4_wildcard_explosion.benchmark:main"
+protomq-bench-b5 = "b5_protobuf_load.benchmark:main"
+protomq-bench-b6 = "b6_connection_churn.benchmark:main"
+protomq-bench-b7 = "b7_message_sizes.benchmark:main"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    "b1_baseline_concurrency",
+    "b2_thundering_herd",
+    "b3_sustained_throughput",
+    "b4_wildcard_explosion",
+    "b5_protobuf_load",
+    "b6_connection_churn",
+    "b7_message_sizes",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

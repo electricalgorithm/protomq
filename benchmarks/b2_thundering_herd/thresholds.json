@@ -1,0 +1,43 @@
+{
+    "concurrent_connections": {
+        "direction": "higher",
+        "min": 9500,
+        "description": "At least 95% of 10k clients must connect"
+    },
+    "connection_time_s": {
+        "direction": "lower",
+        "max": 2.0,
+        "warn": 1.5,
+        "description": "Time to establish 10k connections"
+    },
+    "fan_out_time_s": {
+        "direction": "lower",
+        "max": 0.30,
+        "warn": 0.20,
+        "description": "Time from first publish to last message received"
+    },
+    "peak_memory_mb": {
+        "direction": "lower",
+        "max": 100.0,
+        "warn": 90.0,
+        "description": "Peak server memory during test"
+    },
+    "peak_cpu_percent": {
+        "direction": "lower",
+        "max": 10.0,
+        "warn": 5.0,
+        "description": "Peak CPU usage (single core = 100%)"
+    },
+    "message_loss_count": {
+        "direction": "lower",
+        "max": 10,
+        "warn": 0,
+        "description": "Number of lost messages (0.1% of 10k)"
+    },
+    "connection_failures": {
+        "direction": "lower",
+        "max": 500,
+        "warn": 0,
+        "description": "Number of failed connections (5% of 10k)"
+    }
+}

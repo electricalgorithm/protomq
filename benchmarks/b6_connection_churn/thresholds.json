@@ -1,0 +1,31 @@
+{
+    "total_connections": {
+        "direction": "higher",
+        "min": 95000,
+        "description": "At least 95% of 100k connections succeeded"
+    },
+    "connection_rate_per_s": {
+        "direction": "higher",
+        "min": 2000,
+        "warn": 2500,
+        "description": "Connection rate (connections/second)"
+    },
+    "memory_leak_mb": {
+        "direction": "lower",
+        "max": 10.0,
+        "warn": 5.0,
+        "description": "Memory growth from start to end"
+    },
+    "fd_leak_count": {
+        "direction": "lower",
+        "max": 10,
+        "warn": 0,
+        "description": "File descriptor leak count"
+    },
+    "error_rate_percent": {
+        "direction": "lower",
+        "max": 1.0,
+        "warn": 0.0,
+        "description": "Connection error rate percentage"
+    }
+}

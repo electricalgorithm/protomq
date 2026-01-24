@@ -1,0 +1,42 @@
+{
+    "publishers": {
+        "direction": "higher",
+        "min": 950,
+        "description": "At least 95% of 1000 publishers connected"
+    },
+    "subscribers": {
+        "direction": "higher",
+        "min": 950,
+        "description": "At least 95% of 1000 subscribers connected"
+    },
+    "sustained_throughput_msg_per_s": {
+        "direction": "higher",
+        "min": 8000,
+        "warn": 10000,
+        "description": "Sustained messages/second over 10 minutes"
+    },
+    "p99_latency_at_10min_ms": {
+        "direction": "lower",
+        "max": 0.6,
+        "warn": 0.4,
+        "description": "p99 latency at end of test (degradation check)"
+    },
+    "memory_growth_mb": {
+        "direction": "lower",
+        "max": 5.0,
+        "warn": 2.0,
+        "description": "Memory growth from start to end"
+    },
+    "avg_cpu_percent": {
+        "direction": "lower",
+        "max": 30.0,
+        "warn": 20.0,
+        "description": "Average CPU usage over test"
+    },
+    "message_loss_percent": {
+        "direction": "lower",
+        "max": 0.01,
+        "warn": 0.0,
+        "description": "Percentage of lost messages"
+    }
+}

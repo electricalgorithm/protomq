@@ -1,0 +1,31 @@
+{
+    "topic_matching_latency_us": {
+        "direction": "lower",
+        "max": 15.0,
+        "warn": 10.0,
+        "description": "Average topic matching latency in microseconds"
+    },
+    "total_fanout_time_s": {
+        "direction": "lower",
+        "max": 0.20,
+        "warn": 0.15,
+        "description": "Time for all publishes to complete with fan-out"
+    },
+    "peak_memory_mb": {
+        "direction": "lower",
+        "max": 25.0,
+        "warn": 15.0,
+        "description": "Peak server memory for wildcard subscriptions"
+    },
+    "avg_cpu_percent": {
+        "direction": "lower",
+        "max": 80.0,
+        "warn": 50.0,
+        "description": "Average CPU during publishing"
+    },
+    "correctness_percent": {
+        "direction": "higher",
+        "min": 99.9,
+        "description": "Percentage of correct message deliveries"
+    }
+}

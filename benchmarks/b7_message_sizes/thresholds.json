@@ -1,0 +1,37 @@
+{
+    "p99_latency_10b_ms": {
+        "direction": "lower",
+        "max": 0.02,
+        "description": "p99 latency for 10-byte messages"
+    },
+    "p99_latency_100b_ms": {
+        "direction": "lower",
+        "max": 0.04,
+        "description": "p99 latency for 100-byte messages"
+    },
+    "p99_latency_1kb_ms": {
+        "direction": "lower",
+        "max": 0.06,
+        "description": "p99 latency for 1KB messages"
+    },
+    "p99_latency_10kb_ms": {
+        "direction": "lower",
+        "max": 0.08,
+        "description": "p99 latency for 10KB messages"
+    },
+    "p99_latency_64kb_ms": {
+        "direction": "lower",
+        "max": 0.12,
+        "description": "p99 latency for 64KB messages"
+    },
+    "throughput_10b_msg_per_s": {
+        "direction": "higher",
+        "min": 200000,
+        "description": "Throughput for tiny messages"
+    },
+    "throughput_64kb_msg_per_s": {
+        "direction": "higher",
+        "min": 20000,
+        "description": "Throughput for large messages"
+    }
+}

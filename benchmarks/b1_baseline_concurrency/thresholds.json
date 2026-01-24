@@ -1,0 +1,31 @@
+{
+    "concurrent_connections": {
+        "direction": "higher",
+        "min": 100,
+        "description": "Must successfully connect at least 100 clients"
+    },
+    "connection_time_s": {
+        "direction": "lower",
+        "max": 0.05,
+        "warn": 0.03,
+        "description": "Connection time should be under 1s"
+    },
+    "p50_latency_ms": {
+        "direction": "lower",
+        "max": 0.20,
+        "warn": 0.15,
+        "description": "p50 latency threshold"
+    },
+    "p99_latency_ms": {
+        "direction": "lower",
+        "max": 0.5,
+        "warn": 0.4,
+        "description": "p99 latency threshold"
+    },
+    "memory_mb": {
+        "direction": "lower",
+        "max": 3.0,
+        "warn": 2.5,
+        "description": "Memory usage for 100 clients"
+    }
+}

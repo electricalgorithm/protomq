@@ -1,0 +1,30 @@
+{
+    "payload_size_bytes": {
+        "direction": "lower",
+        "max": 40,
+        "description": "Protobuf payload size (should be ~30-35% smaller than JSON)"
+    },
+    "decoding_latency_us": {
+        "direction": "lower",
+        "max": 15,
+        "warn": 10,
+        "description": "Protobuf decoding latency in microseconds"
+    },
+    "p99_latency_ms": {
+        "direction": "lower",
+        "max": 0.5,
+        "warn": 0.35,
+        "description": "End-to-end p99 latency"
+    },
+    "cpu_overhead_percent": {
+        "direction": "lower",
+        "max": 15.0,
+        "warn": 10.0,
+        "description": "CPU overhead vs baseline"
+    },
+    "bandwidth_savings_percent": {
+        "direction": "higher",
+        "min": 30.0,
+        "description": "Bandwidth savings vs JSON"
+    }
+}

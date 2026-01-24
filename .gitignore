@@ -3,6 +3,10 @@ zig-cache/
 zig-out/
 .zig-cache/
 
+# Python artifacts
+.venv/
+__pycache__/
+
 # Build outputs
 *.o
 *.a

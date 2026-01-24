@@ -1,0 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "protomq-benchmarks"
+version = "0.1.0"
+description = "ProtoMQ benchmark utilities"
+requires-python = ">=3.11"
+dependencies = [
+    "psutil>=6.1.1",
+]
