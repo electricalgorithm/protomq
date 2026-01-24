@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Callable, Any
 from functools import wraps
 
-from .environment import collect_environment, Environment
+from .environment import collect_environment, Environment, get_hardware_dir_name
 from .thresholds import ThresholdChecker
 
 
@@ -97,7 +97,8 @@ class BenchmarkRunner:
         1. Collect environment information
         2. Run benchmark function (with timeout)
         3. Validate results against thresholds
-        4. Save JSON output to {commit_id}_{benchmark_name}.json
+        4. Save JSON output to hardware-specific directory
+        5. Create per-benchmark latest symlink
         """
         if self.benchmark_func is None:
             raise RuntimeError("No benchmark function registered. Use @runner.benchmark decorator.")
@@ -142,10 +143,14 @@ class BenchmarkRunner:
         
         # Save results
         output_path = Path(output_dir)
-        output_path.mkdir(parents=True, exist_ok=True)
+        
+        # Generate hardware-specific directory
+        hardware_dir = get_hardware_dir_name(self.environment)
+        hardware_results_path = output_path / hardware_dir
+        hardware_results_path.mkdir(parents=True, exist_ok=True)
         
         # Use commit_id instead of timestamp for filename
-        result_file = output_path / f"{commit_id}_{self.name}.json"
+        result_file = hardware_results_path / f"{commit_id}_{self.name}.json"
         
         output = {
             "benchmark": {
@@ -163,12 +168,13 @@ class BenchmarkRunner:
         with open(result_file, "w") as f:
             json.dump(output, f, indent=2, default=str)
         
-        print(f"Results saved to: {result_file}\n")
-        
-        # Create/update latest symlink
-        latest_link = output_path / "latest.json"
+        # Create per-benchmark latest symlink
+        latest_link = hardware_results_path / f"latest-{self.name}.json"
         if latest_link.exists() or latest_link.is_symlink():
             latest_link.unlink()
         latest_link.symlink_to(result_file.name)
+        
+        print(f"Results saved to: {result_file}")
+        print(f"Latest symlink: {latest_link}\n")
         
         return threshold_status["passed"]

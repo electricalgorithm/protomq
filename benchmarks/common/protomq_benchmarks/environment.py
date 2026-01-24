@@ -4,6 +4,7 @@ Environment detection and system information collection.
 
 from dataclasses import dataclass, asdict
 from enum import StrEnum
+import os
 import platform
 import subprocess
 import psutil
@@ -147,7 +148,34 @@ class Environment:
 
 def detect_cpu_info() -> HardwareInfo:
     """Detect CPU and hardware information"""
+    # Get CPU model - platform.processor() returns "arm" on macOS, need sysctl
     cpu_model = platform.processor() or "Unknown"
+    
+    # On macOS, get actual chip name from sysctl
+    if platform.system() == "Darwin" and cpu_model == "arm":
+        try:
+            result = subprocess.run(
+                ["sysctl", "-n", "machdep.cpu.brand_string"],
+                capture_output=True,
+                text=True,
+                timeout=2
+            )
+            if result.returncode == 0:
+                cpu_model = result.stdout.strip()
+            
+            # Fallback to chip name if brand_string doesn't work
+            if not cpu_model or cpu_model == "arm":
+                result = subprocess.run(
+                    ["sysctl", "-n", "hw.model"],
+                    capture_output=True,
+                    text=True,
+                    timeout=2
+                )
+                if result.returncode == 0:
+                    cpu_model = result.stdout.strip()
+        except Exception:
+            pass
+    
     cpu_arch = CpuArchitecture.detect()
     cpu_cores = psutil.cpu_count(logical=False) or psutil.cpu_count()
     
@@ -217,6 +245,49 @@ def get_protomq_version() -> ProtoMQInfo:
         buffer_size=4096,
         max_connections=1000
     )
+
+
+def get_hardware_dir_name(env: Environment) ->str:
+    """
+    Generate hardware-specific directory name for organizing results.
+    
+    Format: {os}_{os_version}_{cpu_model}_{arch}
+    Example: darwin_25.2.0_m2pro_arm64
+    
+    Can be overridden with BENCHMARK_HARDWARE_ID environment variable.
+    """
+    # Allow manual override
+    if "BENCHMARK_HARDWARE_ID" in os.environ:
+        return os.environ["BENCHMARK_HARDWARE_ID"]
+    
+    # Auto-generate from environment
+    os_name = env.software.os_name.lower()
+    os_version = env.software.kernel  # Use kernel version (e.g., 25.2.0)
+    
+    # Simplify CPU model (remove spaces, make lowercase)
+    cpu_model = env.hardware.cpu_model.lower()
+    cpu_model = cpu_model.replace(" ", "").replace("(", "").replace(")", "")
+    
+    # Extract chip name for Apple Silicon
+    if "apple" in cpu_model:
+        # Remove "apple" prefix and surrounding text
+        cpu_model = cpu_model.replace("apple", "")
+        
+        # Find chip name (m1, m2, m3, m4 variants)
+        for chip in ["m4ultra", "m4max", "m4pro", "m4", 
+                     "m3ultra", "m3max", "m3pro", "m3",
+                     "m2ultra", "m2max", "m2pro", "m2",
+                     "m1ultra", "m1max", "m1pro", "m1"]:
+            if chip in cpu_model:
+                cpu_model = chip
+                break
+    else:
+        # For Intel/AMD, take first 20 chars
+        cpu_model = cpu_model[:20]
+    
+    arch = env.hardware.cpu_arch.value
+    
+    return f"{os_name}_{os_version}_{cpu_model}_{arch}"
 
 
 def collect_environment() -> Environment:
