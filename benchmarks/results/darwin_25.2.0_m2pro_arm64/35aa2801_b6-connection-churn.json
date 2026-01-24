@@ -1,0 +1,114 @@
+{
+  "benchmark": {
+    "name": "b6-connection-churn",
+    "version": "1.0.0",
+    "description": "Connection churn stability test (rapid connect/disconnect)",
+    "timestamp": "2026-01-24T21:55:00.316860+00:00",
+    "duration_s": 37.888
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Apple M2 Pro",
+      "cpu_arch": "arm64",
+      "cpu_cores": 10,
+      "cpu_freq_mhz": {
+        "base": 702,
+        "max": 3504
+      },
+      "ram_gb": 16.0,
+      "storage": {
+        "type": "SSD",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Darwin",
+      "os_version": "Darwin Kernel Version 25.2.0: Tue Nov 18 21:07:05 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T6020",
+      "kernel": "25.2.0",
+      "zig_version": "0.15.2",
+      "python_version": "3.14.2",
+      "build_mode": "ReleaseSafe"
+    },
+    "network": {
+      "backend": "kqueue",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "35aa2801",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "total_connections": 100000,
+    "connection_rate_per_s": 2640.2,
+    "memory_leak_mb": 4.94,
+    "fd_leak_count": 0,
+    "error_rate_percent": 0.0,
+    "failed_connections": 0
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [],
+    "failures": [],
+    "details": {
+      "total_connections": {
+        "status": "OK",
+        "value": 100000,
+        "threshold": {
+          "direction": "higher",
+          "min": 95000,
+          "max": null,
+          "warn": null
+        }
+      },
+      "connection_rate_per_s": {
+        "status": "OK",
+        "value": 2640.2,
+        "threshold": {
+          "direction": "higher",
+          "min": 2000,
+          "max": null,
+          "warn": 2500
+        }
+      },
+      "memory_leak_mb": {
+        "status": "OK",
+        "value": 4.94,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10.0,
+          "warn": 5.0
+        }
+      },
+      "fd_leak_count": {
+        "status": "OK",
+        "value": 0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10,
+          "warn": 0
+        }
+      },
+      "error_rate_percent": {
+        "status": "OK",
+        "value": 0.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 1.0,
+          "warn": 0.0
+        }
+      },
+      "failed_connections": {
+        "status": "SKIP",
+        "value": 0,
+        "threshold": null
+      }
+    }
+  }
+}

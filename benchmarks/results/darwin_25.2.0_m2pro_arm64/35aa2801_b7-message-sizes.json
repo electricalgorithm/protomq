@@ -1,0 +1,178 @@
+{
+  "benchmark": {
+    "name": "b7-message-sizes",
+    "version": "1.0.0",
+    "description": "Message size variation performance test",
+    "timestamp": "2026-01-24T21:56:46.949513+00:00",
+    "duration_s": 1.601
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Apple M2 Pro",
+      "cpu_arch": "arm64",
+      "cpu_cores": 10,
+      "cpu_freq_mhz": {
+        "base": 702,
+        "max": 3504
+      },
+      "ram_gb": 16.0,
+      "storage": {
+        "type": "SSD",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Darwin",
+      "os_version": "Darwin Kernel Version 25.2.0: Tue Nov 18 21:07:05 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T6020",
+      "kernel": "25.2.0",
+      "zig_version": "0.15.2",
+      "python_version": "3.14.2",
+      "build_mode": "ReleaseSafe"
+    },
+    "network": {
+      "backend": "kqueue",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "35aa2801",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "p99_latency_10b_ms": 0.012,
+    "throughput_10b_msg_per_s": 207776.0,
+    "memory_10b_mb": 2.53,
+    "p99_latency_100b_ms": 0.023,
+    "throughput_100b_msg_per_s": 139214.0,
+    "memory_100b_mb": 2.53,
+    "p99_latency_1kb_ms": 0.011,
+    "throughput_1kb_msg_per_s": 192734.0,
+    "memory_1kb_mb": 2.53,
+    "p99_latency_10kb_ms": 0.016,
+    "throughput_10kb_msg_per_s": 8748.0,
+    "memory_10kb_mb": 1.67,
+    "p99_latency_64kb_ms": 0.063,
+    "throughput_64kb_msg_per_s": 43898.0,
+    "memory_64kb_mb": 1.67
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [],
+    "failures": [],
+    "details": {
+      "p99_latency_10b_ms": {
+        "status": "OK",
+        "value": 0.012,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.04,
+          "warn": null
+        }
+      },
+      "throughput_10b_msg_per_s": {
+        "status": "OK",
+        "value": 207776.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 200000,
+          "max": null,
+          "warn": null
+        }
+      },
+      "memory_10b_mb": {
+        "status": "SKIP",
+        "value": 2.53,
+        "threshold": null
+      },
+      "p99_latency_100b_ms": {
+        "status": "OK",
+        "value": 0.023,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.06,
+          "warn": null
+        }
+      },
+      "throughput_100b_msg_per_s": {
+        "status": "SKIP",
+        "value": 139214.0,
+        "threshold": null
+      },
+      "memory_100b_mb": {
+        "status": "SKIP",
+        "value": 2.53,
+        "threshold": null
+      },
+      "p99_latency_1kb_ms": {
+        "status": "OK",
+        "value": 0.011,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.08,
+          "warn": null
+        }
+      },
+      "throughput_1kb_msg_per_s": {
+        "status": "SKIP",
+        "value": 192734.0,
+        "threshold": null
+      },
+      "memory_1kb_mb": {
+        "status": "SKIP",
+        "value": 2.53,
+        "threshold": null
+      },
+      "p99_latency_10kb_ms": {
+        "status": "OK",
+        "value": 0.016,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.12,
+          "warn": null
+        }
+      },
+      "throughput_10kb_msg_per_s": {
+        "status": "SKIP",
+        "value": 8748.0,
+        "threshold": null
+      },
+      "memory_10kb_mb": {
+        "status": "SKIP",
+        "value": 1.67,
+        "threshold": null
+      },
+      "p99_latency_64kb_ms": {
+        "status": "OK",
+        "value": 0.063,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.16,
+          "warn": null
+        }
+      },
+      "throughput_64kb_msg_per_s": {
+        "status": "OK",
+        "value": 43898.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 20000,
+          "max": null,
+          "warn": null
+        }
+      },
+      "memory_64kb_mb": {
+        "status": "SKIP",
+        "value": 1.67,
+        "threshold": null
+      }
+    }
+  }
+}

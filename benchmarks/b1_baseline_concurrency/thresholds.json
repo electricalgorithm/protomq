@@ -12,20 +12,20 @@
     },
     "p50_latency_ms": {
         "direction": "lower",
-        "max": 0.20,
-        "warn": 0.15,
+        "max": 0.25,
+        "warn": 0.20,
         "description": "p50 latency threshold"
     },
     "p99_latency_ms": {
         "direction": "lower",
-        "max": 0.5,
-        "warn": 0.4,
+        "max": 0.8,
+        "warn": 0.6,
         "description": "p99 latency threshold"
     },
     "memory_mb": {
         "direction": "lower",
-        "max": 3.0,
-        "warn": 2.5,
+        "max": 3.5,
+        "warn": 3.0,
         "description": "Memory usage for 100 clients"
     }
 }

@@ -1,0 +1,116 @@
+{
+  "benchmark": {
+    "name": "b5-protobuf-load",
+    "version": "1.0.0",
+    "description": "Protobuf payload size and processing comparison",
+    "timestamp": "2026-01-24T21:53:38.934606+00:00",
+    "duration_s": 16.323
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Apple M2 Pro",
+      "cpu_arch": "arm64",
+      "cpu_cores": 10,
+      "cpu_freq_mhz": {
+        "base": 702,
+        "max": 3504
+      },
+      "ram_gb": 16.0,
+      "storage": {
+        "type": "SSD",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Darwin",
+      "os_version": "Darwin Kernel Version 25.2.0: Tue Nov 18 21:07:05 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T6020",
+      "kernel": "25.2.0",
+      "zig_version": "0.15.2",
+      "python_version": "3.14.2",
+      "build_mode": "ReleaseSafe"
+    },
+    "network": {
+      "backend": "kqueue",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "35aa2801",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "payload_size_bytes": 40,
+    "decoding_latency_us": 4.2,
+    "p99_latency_ms": 0.008,
+    "cpu_overhead_percent": 0.0,
+    "bandwidth_savings_percent": 20.0,
+    "json_size_bytes": 50
+  },
+  "thresholds": {
+    "passed": false,
+    "warnings": [],
+    "failures": [
+      "bandwidth_savings_percent=20.0 below min=30.0"
+    ],
+    "details": {
+      "payload_size_bytes": {
+        "status": "OK",
+        "value": 40,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 40,
+          "warn": null
+        }
+      },
+      "decoding_latency_us": {
+        "status": "OK",
+        "value": 4.2,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 15,
+          "warn": 10
+        }
+      },
+      "p99_latency_ms": {
+        "status": "OK",
+        "value": 0.008,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.5,
+          "warn": 0.35
+        }
+      },
+      "cpu_overhead_percent": {
+        "status": "OK",
+        "value": 0.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 15.0,
+          "warn": 10.0
+        }
+      },
+      "bandwidth_savings_percent": {
+        "status": "FAIL",
+        "value": 20.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 30.0,
+          "max": null,
+          "warn": null
+        }
+      },
+      "json_size_bytes": {
+        "status": "SKIP",
+        "value": 50,
+        "threshold": null
+      }
+    }
+  }
+}

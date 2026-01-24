@@ -1,0 +1,128 @@
+{
+  "benchmark": {
+    "name": "b4-wildcard-explosion",
+    "version": "1.0.0",
+    "description": "Wildcard subscription stress test with overlapping patterns",
+    "timestamp": "2026-01-24T21:53:14.781049+00:00",
+    "duration_s": 4.49
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Apple M2 Pro",
+      "cpu_arch": "arm64",
+      "cpu_cores": 10,
+      "cpu_freq_mhz": {
+        "base": 702,
+        "max": 3504
+      },
+      "ram_gb": 16.0,
+      "storage": {
+        "type": "SSD",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Darwin",
+      "os_version": "Darwin Kernel Version 25.2.0: Tue Nov 18 21:07:05 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T6020",
+      "kernel": "25.2.0",
+      "zig_version": "0.15.2",
+      "python_version": "3.14.2",
+      "build_mode": "ReleaseSafe"
+    },
+    "network": {
+      "backend": "kqueue",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "35aa2801",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "topic_matching_latency_us": 7.15,
+    "total_fanout_time_s": 0.08,
+    "peak_memory_mb": 12.27,
+    "avg_cpu_percent": 64.3,
+    "correctness_percent": 100.0,
+    "publishers": 100,
+    "subscribers": 1000,
+    "total_messages": 10000
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [
+      "avg_cpu_percent=64.3 exceeds warn=50.0"
+    ],
+    "failures": [],
+    "details": {
+      "topic_matching_latency_us": {
+        "status": "OK",
+        "value": 7.15,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 15.0,
+          "warn": 10.0
+        }
+      },
+      "total_fanout_time_s": {
+        "status": "OK",
+        "value": 0.08,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.2,
+          "warn": 0.15
+        }
+      },
+      "peak_memory_mb": {
+        "status": "OK",
+        "value": 12.27,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 25.0,
+          "warn": 15.0
+        }
+      },
+      "avg_cpu_percent": {
+        "status": "WARN",
+        "value": 64.3,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 80.0,
+          "warn": 50.0
+        }
+      },
+      "correctness_percent": {
+        "status": "OK",
+        "value": 100.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 99.9,
+          "max": null,
+          "warn": null
+        }
+      },
+      "publishers": {
+        "status": "SKIP",
+        "value": 100,
+        "threshold": null
+      },
+      "subscribers": {
+        "status": "SKIP",
+        "value": 1000,
+        "threshold": null
+      },
+      "total_messages": {
+        "status": "SKIP",
+        "value": 10000,
+        "threshold": null
+      }
+    }
+  }
+}

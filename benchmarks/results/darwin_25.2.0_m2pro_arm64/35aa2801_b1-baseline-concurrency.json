@@ -1,0 +1,108 @@
+{
+  "benchmark": {
+    "name": "b1-baseline-concurrency",
+    "version": "1.0.0",
+    "description": "Baseline concurrency and latency test",
+    "timestamp": "2026-01-24T21:52:27.003253+00:00",
+    "duration_s": 1.072
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Apple M2 Pro",
+      "cpu_arch": "arm64",
+      "cpu_cores": 10,
+      "cpu_freq_mhz": {
+        "base": 702,
+        "max": 3504
+      },
+      "ram_gb": 16.0,
+      "storage": {
+        "type": "SSD",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Darwin",
+      "os_version": "Darwin Kernel Version 25.2.0: Tue Nov 18 21:07:05 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T6020",
+      "kernel": "25.2.0",
+      "zig_version": "0.15.2",
+      "python_version": "3.14.2",
+      "build_mode": "ReleaseSafe"
+    },
+    "network": {
+      "backend": "kqueue",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "35aa2801",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "concurrent_connections": 100,
+    "connection_time_s": 0.029,
+    "p50_latency_ms": 0.155,
+    "p99_latency_ms": 0.443,
+    "memory_mb": 2.62
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [],
+    "failures": [],
+    "details": {
+      "concurrent_connections": {
+        "status": "OK",
+        "value": 100,
+        "threshold": {
+          "direction": "higher",
+          "min": 100,
+          "max": null,
+          "warn": null
+        }
+      },
+      "connection_time_s": {
+        "status": "OK",
+        "value": 0.029,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.05,
+          "warn": 0.03
+        }
+      },
+      "p50_latency_ms": {
+        "status": "OK",
+        "value": 0.155,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.25,
+          "warn": 0.2
+        }
+      },
+      "p99_latency_ms": {
+        "status": "OK",
+        "value": 0.443,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.8,
+          "warn": 0.6
+        }
+      },
+      "memory_mb": {
+        "status": "OK",
+        "value": 2.62,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 3.5,
+          "warn": 3.0
+        }
+      }
+    }
+  }
+}

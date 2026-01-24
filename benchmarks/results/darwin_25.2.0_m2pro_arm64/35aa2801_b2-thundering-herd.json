@@ -1,0 +1,136 @@
+{
+  "benchmark": {
+    "name": "b2-thundering-herd",
+    "version": "1.0.0",
+    "description": "Thundering herd: 10k concurrent clients burst publish",
+    "timestamp": "2026-01-24T21:52:47.813385+00:00",
+    "duration_s": 10.238
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Apple M2 Pro",
+      "cpu_arch": "arm64",
+      "cpu_cores": 10,
+      "cpu_freq_mhz": {
+        "base": 702,
+        "max": 3504
+      },
+      "ram_gb": 16.0,
+      "storage": {
+        "type": "SSD",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Darwin",
+      "os_version": "Darwin Kernel Version 25.2.0: Tue Nov 18 21:07:05 PST 2025; root:xnu-12377.61.12~1/RELEASE_ARM64_T6020",
+      "kernel": "25.2.0",
+      "zig_version": "0.15.2",
+      "python_version": "3.14.2",
+      "build_mode": "ReleaseSafe"
+    },
+    "network": {
+      "backend": "kqueue",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "35aa2801",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "concurrent_connections": 10000,
+    "connection_time_s": 1.03,
+    "fan_out_time_s": 0.12,
+    "peak_memory_mb": 86.56,
+    "peak_cpu_percent": 3.6,
+    "message_loss_count": 0,
+    "connection_failures": 0,
+    "messages_received": 10000
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [],
+    "failures": [],
+    "details": {
+      "concurrent_connections": {
+        "status": "OK",
+        "value": 10000,
+        "threshold": {
+          "direction": "higher",
+          "min": 9500,
+          "max": null,
+          "warn": null
+        }
+      },
+      "connection_time_s": {
+        "status": "OK",
+        "value": 1.03,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 2.0,
+          "warn": 1.5
+        }
+      },
+      "fan_out_time_s": {
+        "status": "OK",
+        "value": 0.12,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.3,
+          "warn": 0.2
+        }
+      },
+      "peak_memory_mb": {
+        "status": "OK",
+        "value": 86.56,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 100.0,
+          "warn": 90.0
+        }
+      },
+      "peak_cpu_percent": {
+        "status": "OK",
+        "value": 3.6,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10.0,
+          "warn": 5.0
+        }
+      },
+      "message_loss_count": {
+        "status": "OK",
+        "value": 0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10,
+          "warn": 0
+        }
+      },
+      "connection_failures": {
+        "status": "OK",
+        "value": 0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 500,
+          "warn": 0
+        }
+      },
+      "messages_received": {
+        "status": "SKIP",
+        "value": 10000,
+        "threshold": null
+      }
+    }
+  }
+}
