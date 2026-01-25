@@ -51,13 +51,19 @@ For the initial release, we support:
 
 ### Performance Results
 
-Verified metrics with 100 concurrent clients on Apple M2 Pro (macOS) and Raspberry Pi 5 (Linux):
+ProtoMQ delivers high performance across both high-end and edge hardware:
 
-- **Concurrency**: 100+ concurrent connections verified.
-- **Latency (p99)**: < 0.3ms (Measured 0.24ms for MacOS and 0.17ms for Linux).
-- **Memory Footprint**: < 2.4 MB for 100 clients (Measured 2.41 MB for MacOS and 2.00 MB for Linux).
+| Scenario | Apple M2 Pro | Raspberry Pi 5 |
+|----------|--------------|----------------|
+| Latency (p99, 100 clients) | 0.44 ms | 0.13 ms |
+| Concurrent clients | 10,000 | 10,000 |
+| Sustained throughput | 9k msg/s | 9k msg/s |
+| Message throughput (small) | 208k msg/s | 147k msg/s |
+| Memory (100 clients) | 2.6 MB | 2.5 MB |
 
-For detailed methodology and full results, see [RESULTS.md](benchmarks/RESULTS.md).
+Handles 100,000 connection cycles with zero memory leaks and sub-millisecond latency.
+
+For detailed methodology and full results, see [ProtoMQ Benchmarking Suite](benchmarks/README.md).
 
 ### Contributing
 
