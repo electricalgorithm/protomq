@@ -1,0 +1,110 @@
+{
+  "benchmark": {
+    "name": "b1-baseline-concurrency",
+    "version": "1.0.0",
+    "description": "Baseline concurrency and latency test",
+    "timestamp": "2026-01-25T10:43:28.684434+00:00",
+    "duration_s": 1.135
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Unknown",
+      "cpu_arch": "arm64",
+      "cpu_cores": 4,
+      "cpu_freq_mhz": {
+        "base": 1500.0,
+        "max": 2400.0
+      },
+      "ram_gb": 7.86,
+      "storage": {
+        "type": "Unknown",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Linux",
+      "os_version": "#1 SMP PREEMPT Debian 1:6.6.62-1+rpt1 (2024-11-25)",
+      "kernel": "6.6.62+rpt-rpi-2712",
+      "zig_version": "0.15.2",
+      "python_version": "3.11.2",
+      "build_mode": "Unknown"
+    },
+    "network": {
+      "backend": "epoll",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "1b0c5d20",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "concurrent_connections": 100,
+    "connection_time_s": 0.057,
+    "p50_latency_ms": 0.085,
+    "p99_latency_ms": 0.134,
+    "memory_mb": 1.0
+  },
+  "thresholds": {
+    "passed": false,
+    "warnings": [],
+    "failures": [
+      "connection_time_s=0.057 exceeds max=0.05"
+    ],
+    "details": {
+      "concurrent_connections": {
+        "status": "OK",
+        "value": 100,
+        "threshold": {
+          "direction": "higher",
+          "min": 100,
+          "max": null,
+          "warn": null
+        }
+      },
+      "connection_time_s": {
+        "status": "FAIL",
+        "value": 0.057,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.05,
+          "warn": 0.03
+        }
+      },
+      "p50_latency_ms": {
+        "status": "OK",
+        "value": 0.085,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.25,
+          "warn": 0.2
+        }
+      },
+      "p99_latency_ms": {
+        "status": "OK",
+        "value": 0.134,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.8,
+          "warn": 0.6
+        }
+      },
+      "memory_mb": {
+        "status": "OK",
+        "value": 1.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 3.5,
+          "warn": 3.0
+        }
+      }
+    }
+  }
+}

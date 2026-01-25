@@ -1,0 +1,140 @@
+{
+  "benchmark": {
+    "name": "b2-thundering-herd",
+    "version": "1.0.0",
+    "description": "Thundering herd: 10k concurrent clients burst publish",
+    "timestamp": "2026-01-25T10:44:39.385639+00:00",
+    "duration_s": 12.613
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Unknown",
+      "cpu_arch": "arm64",
+      "cpu_cores": 4,
+      "cpu_freq_mhz": {
+        "base": 1500.0,
+        "max": 2400.0
+      },
+      "ram_gb": 7.86,
+      "storage": {
+        "type": "Unknown",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Linux",
+      "os_version": "#1 SMP PREEMPT Debian 1:6.6.62-1+rpt1 (2024-11-25)",
+      "kernel": "6.6.62+rpt-rpi-2712",
+      "zig_version": "0.15.2",
+      "python_version": "3.11.2",
+      "build_mode": "Unknown"
+    },
+    "network": {
+      "backend": "epoll",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "1b0c5d20",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "concurrent_connections": 10000,
+    "connection_time_s": 2.07,
+    "fan_out_time_s": 0.21,
+    "peak_memory_mb": 85.0,
+    "peak_cpu_percent": 5.0,
+    "message_loss_count": 0,
+    "connection_failures": 0,
+    "messages_received": 10000
+  },
+  "thresholds": {
+    "passed": false,
+    "warnings": [
+      "fan_out_time_s=0.21 exceeds warn=0.2"
+    ],
+    "failures": [
+      "connection_time_s=2.07 exceeds max=2.0"
+    ],
+    "details": {
+      "concurrent_connections": {
+        "status": "OK",
+        "value": 10000,
+        "threshold": {
+          "direction": "higher",
+          "min": 9500,
+          "max": null,
+          "warn": null
+        }
+      },
+      "connection_time_s": {
+        "status": "FAIL",
+        "value": 2.07,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 2.0,
+          "warn": 1.5
+        }
+      },
+      "fan_out_time_s": {
+        "status": "WARN",
+        "value": 0.21,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.3,
+          "warn": 0.2
+        }
+      },
+      "peak_memory_mb": {
+        "status": "OK",
+        "value": 85.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 100.0,
+          "warn": 90.0
+        }
+      },
+      "peak_cpu_percent": {
+        "status": "OK",
+        "value": 5.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10.0,
+          "warn": 5.0
+        }
+      },
+      "message_loss_count": {
+        "status": "OK",
+        "value": 0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10,
+          "warn": 0
+        }
+      },
+      "connection_failures": {
+        "status": "OK",
+        "value": 0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 500,
+          "warn": 0
+        }
+      },
+      "messages_received": {
+        "status": "SKIP",
+        "value": 10000,
+        "threshold": null
+      }
+    }
+  }
+}

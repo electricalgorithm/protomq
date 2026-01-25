@@ -1,0 +1,144 @@
+{
+  "benchmark": {
+    "name": "b3-sustained-throughput",
+    "version": "1.0.0",
+    "description": "Sustained throughput: 10 minutes of continuous load",
+    "timestamp": "2026-01-25T10:47:48.050367+00:00",
+    "duration_s": 666.548
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Unknown",
+      "cpu_arch": "arm64",
+      "cpu_cores": 4,
+      "cpu_freq_mhz": {
+        "base": 1500.0,
+        "max": 2400.0
+      },
+      "ram_gb": 7.86,
+      "storage": {
+        "type": "Unknown",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Linux",
+      "os_version": "#1 SMP PREEMPT Debian 1:6.6.62-1+rpt1 (2024-11-25)",
+      "kernel": "6.6.62+rpt-rpi-2712",
+      "zig_version": "0.15.2",
+      "python_version": "3.11.2",
+      "build_mode": "Unknown"
+    },
+    "network": {
+      "backend": "epoll",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "1b0c5d20",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "publishers": 1000,
+    "subscribers": 1000,
+    "sustained_throughput_msg_per_s": 9012.0,
+    "p99_latency_at_10min_ms": 0.118,
+    "memory_growth_mb": -0.52,
+    "avg_cpu_percent": 0.5,
+    "message_loss_percent": 0.0,
+    "total_messages_sent": 6000000,
+    "duration_s": 665.8
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [
+      "sustained_throughput_msg_per_s=9012.0 below warn=10000"
+    ],
+    "failures": [],
+    "details": {
+      "publishers": {
+        "status": "OK",
+        "value": 1000,
+        "threshold": {
+          "direction": "higher",
+          "min": 950,
+          "max": null,
+          "warn": null
+        }
+      },
+      "subscribers": {
+        "status": "OK",
+        "value": 1000,
+        "threshold": {
+          "direction": "higher",
+          "min": 950,
+          "max": null,
+          "warn": null
+        }
+      },
+      "sustained_throughput_msg_per_s": {
+        "status": "WARN",
+        "value": 9012.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 8000,
+          "max": null,
+          "warn": 10000
+        }
+      },
+      "p99_latency_at_10min_ms": {
+        "status": "OK",
+        "value": 0.118,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.6,
+          "warn": 0.4
+        }
+      },
+      "memory_growth_mb": {
+        "status": "OK",
+        "value": -0.52,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 5.0,
+          "warn": 2.0
+        }
+      },
+      "avg_cpu_percent": {
+        "status": "OK",
+        "value": 0.5,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 30.0,
+          "warn": 20.0
+        }
+      },
+      "message_loss_percent": {
+        "status": "OK",
+        "value": 0.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.01,
+          "warn": 0.0
+        }
+      },
+      "total_messages_sent": {
+        "status": "SKIP",
+        "value": 6000000,
+        "threshold": null
+      },
+      "duration_s": {
+        "status": "SKIP",
+        "value": 665.8,
+        "threshold": null
+      }
+    }
+  }
+}

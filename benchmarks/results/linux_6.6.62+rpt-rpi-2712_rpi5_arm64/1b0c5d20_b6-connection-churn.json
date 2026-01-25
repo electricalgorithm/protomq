@@ -1,0 +1,117 @@
+{
+  "benchmark": {
+    "name": "b6-connection-churn",
+    "version": "1.0.0",
+    "description": "Connection churn stability test (rapid connect/disconnect)",
+    "timestamp": "2026-01-25T10:46:04.144172+00:00",
+    "duration_s": 44.054
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Unknown",
+      "cpu_arch": "arm64",
+      "cpu_cores": 4,
+      "cpu_freq_mhz": {
+        "base": 1500.0,
+        "max": 2400.0
+      },
+      "ram_gb": 7.86,
+      "storage": {
+        "type": "Unknown",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Linux",
+      "os_version": "#1 SMP PREEMPT Debian 1:6.6.62-1+rpt1 (2024-11-25)",
+      "kernel": "6.6.62+rpt-rpi-2712",
+      "zig_version": "0.15.2",
+      "python_version": "3.11.2",
+      "build_mode": "Unknown"
+    },
+    "network": {
+      "backend": "epoll",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "1b0c5d20",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "total_connections": 100000,
+    "connection_rate_per_s": 2271.0,
+    "memory_leak_mb": 6.02,
+    "fd_leak_count": 0,
+    "error_rate_percent": 0.0,
+    "failed_connections": 0
+  },
+  "thresholds": {
+    "passed": true,
+    "warnings": [
+      "connection_rate_per_s=2271.0 below warn=2500",
+      "memory_leak_mb=6.02 exceeds warn=5.0"
+    ],
+    "failures": [],
+    "details": {
+      "total_connections": {
+        "status": "OK",
+        "value": 100000,
+        "threshold": {
+          "direction": "higher",
+          "min": 95000,
+          "max": null,
+          "warn": null
+        }
+      },
+      "connection_rate_per_s": {
+        "status": "WARN",
+        "value": 2271.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 2000,
+          "max": null,
+          "warn": 2500
+        }
+      },
+      "memory_leak_mb": {
+        "status": "WARN",
+        "value": 6.02,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10.0,
+          "warn": 5.0
+        }
+      },
+      "fd_leak_count": {
+        "status": "OK",
+        "value": 0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 10,
+          "warn": 0
+        }
+      },
+      "error_rate_percent": {
+        "status": "OK",
+        "value": 0.0,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 1.0,
+          "warn": 0.0
+        }
+      },
+      "failed_connections": {
+        "status": "SKIP",
+        "value": 0,
+        "threshold": null
+      }
+    }
+  }
+}

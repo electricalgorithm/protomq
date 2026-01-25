@@ -1,0 +1,181 @@
+{
+  "benchmark": {
+    "name": "b7-message-sizes",
+    "version": "1.0.0",
+    "description": "Message size variation performance test",
+    "timestamp": "2026-01-25T10:46:59.505312+00:00",
+    "duration_s": 1.413
+  },
+  "environment": {
+    "hardware": {
+      "cpu_model": "Unknown",
+      "cpu_arch": "arm64",
+      "cpu_cores": 4,
+      "cpu_freq_mhz": {
+        "base": 1500.0,
+        "max": 2400.0
+      },
+      "ram_gb": 7.86,
+      "storage": {
+        "type": "Unknown",
+        "manufacturer": null,
+        "model": null
+      }
+    },
+    "software": {
+      "os_name": "Linux",
+      "os_version": "#1 SMP PREEMPT Debian 1:6.6.62-1+rpt1 (2024-11-25)",
+      "kernel": "6.6.62+rpt-rpi-2712",
+      "zig_version": "0.15.2",
+      "python_version": "3.11.2",
+      "build_mode": "Unknown"
+    },
+    "network": {
+      "backend": "epoll",
+      "loopback_available": true
+    },
+    "protomq": {
+      "version": "0.1.0",
+      "commit_hash": "1b0c5d20",
+      "buffer_size": 4096,
+      "max_connections": 1000
+    }
+  },
+  "metrics": {
+    "p99_latency_10b_ms": 0.017,
+    "throughput_10b_msg_per_s": 146507.0,
+    "memory_10b_mb": 1.0,
+    "p99_latency_100b_ms": 0.026,
+    "throughput_100b_msg_per_s": 106995.0,
+    "memory_100b_mb": 1.0,
+    "p99_latency_1kb_ms": 0.027,
+    "throughput_1kb_msg_per_s": 100817.0,
+    "memory_1kb_mb": 1.0,
+    "p99_latency_10kb_ms": 0.031,
+    "throughput_10kb_msg_per_s": 100783.0,
+    "memory_10kb_mb": 1.0,
+    "p99_latency_64kb_ms": 0.153,
+    "throughput_64kb_msg_per_s": 10429.0,
+    "memory_64kb_mb": 0.44
+  },
+  "thresholds": {
+    "passed": false,
+    "warnings": [],
+    "failures": [
+      "throughput_10b_msg_per_s=146507.0 below min=200000",
+      "throughput_64kb_msg_per_s=10429.0 below min=20000"
+    ],
+    "details": {
+      "p99_latency_10b_ms": {
+        "status": "OK",
+        "value": 0.017,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.04,
+          "warn": null
+        }
+      },
+      "throughput_10b_msg_per_s": {
+        "status": "FAIL",
+        "value": 146507.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 200000,
+          "max": null,
+          "warn": null
+        }
+      },
+      "memory_10b_mb": {
+        "status": "SKIP",
+        "value": 1.0,
+        "threshold": null
+      },
+      "p99_latency_100b_ms": {
+        "status": "OK",
+        "value": 0.026,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.06,
+          "warn": null
+        }
+      },
+      "throughput_100b_msg_per_s": {
+        "status": "SKIP",
+        "value": 106995.0,
+        "threshold": null
+      },
+      "memory_100b_mb": {
+        "status": "SKIP",
+        "value": 1.0,
+        "threshold": null
+      },
+      "p99_latency_1kb_ms": {
+        "status": "OK",
+        "value": 0.027,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.08,
+          "warn": null
+        }
+      },
+      "throughput_1kb_msg_per_s": {
+        "status": "SKIP",
+        "value": 100817.0,
+        "threshold": null
+      },
+      "memory_1kb_mb": {
+        "status": "SKIP",
+        "value": 1.0,
+        "threshold": null
+      },
+      "p99_latency_10kb_ms": {
+        "status": "OK",
+        "value": 0.031,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.12,
+          "warn": null
+        }
+      },
+      "throughput_10kb_msg_per_s": {
+        "status": "SKIP",
+        "value": 100783.0,
+        "threshold": null
+      },
+      "memory_10kb_mb": {
+        "status": "SKIP",
+        "value": 1.0,
+        "threshold": null
+      },
+      "p99_latency_64kb_ms": {
+        "status": "OK",
+        "value": 0.153,
+        "threshold": {
+          "direction": "lower",
+          "min": null,
+          "max": 0.16,
+          "warn": null
+        }
+      },
+      "throughput_64kb_msg_per_s": {
+        "status": "FAIL",
+        "value": 10429.0,
+        "threshold": {
+          "direction": "higher",
+          "min": 20000,
+          "max": null,
+          "warn": null
+        }
+      },
+      "memory_64kb_mb": {
+        "status": "SKIP",
+        "value": 0.44,
+        "threshold": null
+      }
+    }
+  }
+}
