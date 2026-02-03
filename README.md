@@ -14,7 +14,7 @@
 - Thread-safe Topic Broker with wildcard support (`+`, `#`)
 - Custom Protobuf Engine with runtime `.proto` schema parsing
 - Topic-based Protobuf schema routing
-- MQTT CLI client with automatic JSON-to-Protobuf encoding
+- CLI with automatic JSON-to-Protobuf encoding
 - Structured diagnostic output for Protobuf payloads
 
 ### Building
