@@ -15,7 +15,7 @@
 - Custom Protobuf Engine with runtime `.proto` schema parsing
 - Topic-based Protobuf schema routing
 - **Service Discovery & Schema Registry**: Clients can ask the server "what can I send?" and receive the full `.proto` definitions at runtime.
-- MQTT CLI client with automatic JSON-to-Protobuf encoding
+- CLI with automatic JSON-to-Protobuf encoding
 - Structured diagnostic output for Protobuf payloads
 
 ### Building
