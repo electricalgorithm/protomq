@@ -241,7 +241,7 @@ pub const ProtoParser = struct {
 
         try self.expect(.OpenBrace);
 
-        var msg_def = try types.MessageDefinition.init(self.allocator, short_name);
+        var msg_def = try types.MessageDefinition.init(self.allocator, short_name, self.tokenizer.source);
         errdefer msg_def.deinit(self.allocator);
 
         // Populate full name if package exists?
