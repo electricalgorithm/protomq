@@ -14,6 +14,7 @@
 - Thread-safe Topic Broker with wildcard support (`+`, `#`)
 - Custom Protobuf Engine with runtime `.proto` schema parsing
 - Topic-based Protobuf schema routing
+- **Service Discovery & Schema Registry**: Clients can ask the server "what can I send?" and receive the full `.proto` definitions at runtime.
 - MQTT CLI client with automatic JSON-to-Protobuf encoding
 - Structured diagnostic output for Protobuf payloads
 
@@ -48,6 +49,17 @@ For the initial release, we support:
 - No persistent sessions
 - No retained messages
 - Single-node deployment
+
+### Service Discovery
+
+ProtoMQ includes a built-in Service Discovery mechanism. Clients can discover available topics and their associated Protobuf schemas (including the full source code) by querying the `$SYS/discovery/request` topic.
+
+**Using the CLI for discovery:**
+```bash
+# Verify schemas are loaded and available
+protomq-cli discover --proto-dir schemas
+```
+This allows clients to "bootstrap" themselves without needing pre-shared `.proto` files.
 
 ### Performance Results
 
