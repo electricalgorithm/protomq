@@ -35,12 +35,8 @@ zig build run-client
 # Run tests
 zig build test
 
-# Run integration tests
-zig build && \
-./tests/cases/cli_test.sh && \
-./tests/cases/integration_test.sh && \
-./tests/cases/run_pubsub_test.sh && \
-./tests/cases/discovery_test.sh
+# Run all integration tests
+./tests/run_all.sh
 ```
 
 ### Limitations
