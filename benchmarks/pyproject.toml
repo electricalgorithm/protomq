@@ -3,7 +3,9 @@ name = "protomq-bench-suite"
 version = "0.1.0"
 description = "ProtoMQ benchmark suite scripts"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "psutil>=7.2.2",
+]
 
 [project.scripts]
 protomq-bench-b1 = "b1_baseline_concurrency.benchmark:main"
@@ -23,6 +25,7 @@ packages = [
     "b5_protobuf_load",
     "b6_connection_churn",
     "b7_message_sizes",
+    "common/protomq_benchmarks",
 ]
 
 [build-system]
