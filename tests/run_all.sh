@@ -36,6 +36,7 @@ declare -a TESTS=(
     "tests/cases/integration_test.sh"
     "tests/cases/run_pubsub_test.sh"
     "tests/cases/discovery_test.sh"
+    "tests/cases/admin_server_test.sh"
 )
 
 PASSED=0
