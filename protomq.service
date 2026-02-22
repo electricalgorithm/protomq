@@ -1,0 +1,14 @@
+[Unit]
+Description=ProtoMQ Server
+After=network.target
+
+[Service]
+Type=simple
+User=user
+WorkingDirectory=/home/user/protomq
+ExecStart=/home/user/protomq/zig-out/bin/protomq-server
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
