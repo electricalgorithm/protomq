@@ -4,6 +4,12 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const admin_server = b.option(bool, "admin_server", "Enable the HTTP Admin Server") orelse false;
+
+    const options = b.addOptions();
+    options.addOption(bool, "admin_server", admin_server);
+    const options_module = options.createModule();
+
     // Server executable
     const server_exe = b.addExecutable(.{
         .name = "protomq-server",
@@ -11,6 +17,9 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            .imports = &.{
+                .{ .name = "build_options", .module = options_module },
+            },
         }),
     });
     b.installArtifact(server_exe);
@@ -50,6 +59,9 @@ pub fn build(b: *std.Build) void {
             .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
+            .imports = &.{
+                .{ .name = "build_options", .module = options_module },
+            },
         }),
     });
     const run_unit_tests = b.addRunArtifact(unit_tests);

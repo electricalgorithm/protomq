@@ -7,8 +7,27 @@ const MqttHandler = @import("../broker/mqtt_handler.zig").MqttHandler;
 const IOContext = @import("event_loop.zig").IOContext;
 const packet = @import("../protocol/mqtt/packet.zig");
 const SchemaManager = @import("schema_manager.zig").SchemaManager;
+const build_options = @import("build_options");
+const AdminServer = if (build_options.admin_server) @import("admin.zig").AdminServer else void;
 
-const LISTENER_ID = 0;
+pub const EventType = enum(u32) {
+    mqtt_listener = 0,
+    mqtt_client = 1,
+    admin_listener = 2,
+    admin_client = 3,
+};
+
+pub fn packUdata(evt: EventType, index: u32) usize {
+    return (@as(usize, @intFromEnum(evt)) << 32) | @as(usize, index);
+}
+
+pub fn unpackUdata(udata: usize) struct { evt: EventType, index: u32 } {
+    return .{
+        .evt = @enumFromInt(@as(u32, @truncate(udata >> 32))),
+        .index = @as(u32, @truncate(udata)),
+    };
+}
+
 const ConnectionList = std.ArrayListUnmanaged(?*Connection);
 
 /// Async TCP Server Implementation
@@ -22,6 +41,7 @@ pub const TcpServer = struct {
     mqtt_handler: MqttHandler,
     io_context: IOContext,
     schema_manager: SchemaManager,
+    admin_server: AdminServer,
 
     pub fn init(allocator: std.mem.Allocator, host: []const u8, port: u16) !TcpServer {
         const address = try std.net.Address.parseIp(host, port);
@@ -41,9 +61,13 @@ pub const TcpServer = struct {
             .mqtt_handler = undefined,
             .io_context = io_ctx,
             .schema_manager = SchemaManager.init(allocator),
+            .admin_server = if (build_options.admin_server) try AdminServer.init(allocator, undefined, 8080) else {},
         };
 
         server.mqtt_handler = MqttHandler.init(allocator);
+        if (build_options.admin_server) {
+            server.admin_server.schema_manager = &server.schema_manager;
+        }
 
         // Load Schemas
         try server.schema_manager.loadSchemasFromDir("schemas");
@@ -69,6 +93,9 @@ pub const TcpServer = struct {
         self.io_context.deinit();
         self.mqtt_handler.deinit();
         self.broker.deinit();
+        if (build_options.admin_server) {
+            self.admin_server.deinit();
+        }
         self.schema_manager.deinit();
     }
 
@@ -93,10 +120,16 @@ pub const TcpServer = struct {
         _ = try std.posix.fcntl(self.listener_socket, std.posix.F.SETFL, flags | @as(usize, nonblock_u32));
 
         // Register with Event Loop
-        try self.io_context.registerRead(self.listener_socket, LISTENER_ID);
+        try self.io_context.registerRead(self.listener_socket, packUdata(.mqtt_listener, 0));
 
         std.debug.print("✓ Server listening on {any} (Async)\n", .{self.address});
         self.running = true;
+
+        if (build_options.admin_server) {
+            self.admin_server.tcp_server = self;
+            self.admin_server.schema_manager = &self.schema_manager;
+            try self.admin_server.listen(&self.io_context);
+        }
     }
 
     pub fn run(self: *TcpServer) !void {
@@ -110,20 +143,39 @@ pub const TcpServer = struct {
     }
 
     fn onEvent(self: *TcpServer, udata: usize) void {
-        if (udata == LISTENER_ID) {
-            self.handleAccept() catch |err| {
-                std.debug.print("Accept error: {}\n", .{err});
-            };
-        } else {
-            const index = udata - 1;
-            if (index < self.connections.items.len) {
-                if (self.connections.items[index]) |conn| {
-                    self.handleClient(conn, index) catch |err| {
-                        std.debug.print("Client error (idx {d}): {}\n", .{ index, err });
-                        self.closeClient(index);
+        const ev_info = unpackUdata(udata);
+        switch (ev_info.evt) {
+            .mqtt_listener => {
+                self.handleAccept() catch |err| {
+                    std.debug.print("Accept error: {}\n", .{err});
+                };
+            },
+            .mqtt_client => {
+                const index = ev_info.index;
+                if (index < self.connections.items.len) {
+                    if (self.connections.items[index]) |conn| {
+                        self.handleClient(conn, index) catch |err| {
+                            std.debug.print("Client error (idx {d}): {}\n", .{ index, err });
+                            self.closeClient(index);
+                        };
+                    }
+                }
+            },
+            .admin_listener => {
+                if (build_options.admin_server) {
+                    self.admin_server.handleAccept() catch |err| {
+                        std.debug.print("Admin Accept error: {}\n", .{err});
                     };
                 }
-            }
+            },
+            .admin_client => {
+                if (build_options.admin_server) {
+                    self.admin_server.handleClient(ev_info.index) catch |err| {
+                        std.debug.print("Admin Client error (idx {d}): {}\n", .{ ev_info.index, err });
+                        self.admin_server.closeClient(ev_info.index);
+                    };
+                }
+            },
         }
     }
 
@@ -160,7 +212,7 @@ pub const TcpServer = struct {
                 slot_idx = self.connections.items.len - 1;
             }
 
-            try self.io_context.registerRead(fd, slot_idx + 1);
+            try self.io_context.registerRead(fd, packUdata(.mqtt_client, @intCast(slot_idx)));
         }
     }
 

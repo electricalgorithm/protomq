@@ -4,6 +4,7 @@ const std = @import("std");
 pub const TopicBroker = struct {
     allocator: std.mem.Allocator,
     subscriptions: std.StringHashMap(SubscriberList),
+    total_messages_routed: u64,
 
     const SubscriberList = std.ArrayList(usize); // List of client IDs
 
@@ -11,6 +12,7 @@ pub const TopicBroker = struct {
         return TopicBroker{
             .allocator = allocator,
             .subscriptions = std.StringHashMap(SubscriberList).init(allocator),
+            .total_messages_routed = 0,
         };
     }
 
