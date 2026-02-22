@@ -52,16 +52,20 @@ pub const MessageDefinition = struct {
     name: []const u8,
     // Tag -> Field Mapping
     fields: std.AutoHashMap(u32, FieldDefinition),
+    // Full source code of the .proto file defining this message (for discovery)
+    source_code: []const u8,
 
-    pub fn init(allocator: std.mem.Allocator, name: []const u8) !MessageDefinition {
+    pub fn init(allocator: std.mem.Allocator, name: []const u8, source: []const u8) !MessageDefinition {
         return MessageDefinition{
             .name = try allocator.dupe(u8, name),
             .fields = std.AutoHashMap(u32, FieldDefinition).init(allocator),
+            .source_code = try allocator.dupe(u8, source),
         };
     }
 
     pub fn deinit(self: *MessageDefinition, allocator: std.mem.Allocator) void {
         allocator.free(self.name);
+        allocator.free(self.source_code);
         var it = self.fields.iterator();
         while (it.next()) |entry| {
             allocator.free(entry.value_ptr.name);

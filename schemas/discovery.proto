@@ -1,0 +1,12 @@
+syntax = "proto3";
+package protomq.discovery;
+
+message SchemaInfo {
+  string topic = 1;
+  string message_type = 2;
+  string schema_source = 3;
+}
+
+message ServiceDiscoveryResponse {
+  repeated SchemaInfo schemas = 1;
+}

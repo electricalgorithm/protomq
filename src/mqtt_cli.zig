@@ -3,7 +3,9 @@ const MqttClient = @import("client/client.zig").MqttClient;
 const pb_registry = @import("protocol/protobuf/registry.zig");
 const pb_parser = @import("protocol/protobuf/parser.zig");
 const pb_encoder = @import("protocol/protobuf/encoder.zig");
+const pb_decoder = @import("protocol/protobuf/decoder.zig");
 const pb_json = @import("protocol/protobuf/json_converter.zig");
+const packet = @import("protocol/mqtt/packet.zig");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -147,6 +149,59 @@ pub fn main() !void {
             try client.disconnect();
         }
     } else if (std.mem.eql(u8, command, "connect")) {
+        try client.disconnect();
+    } else if (std.mem.eql(u8, command, "discover")) {
+        std.debug.print("🔍 Discovering services...\n", .{});
+
+        try client.subscribe("$SYS/discovery/response");
+        try client.publish("$SYS/discovery/request", "");
+
+        while (client.connection.?.isActive()) {
+            client.connection.?.offset = 0;
+            const bytes_read = try client.connection.?.read();
+            if (bytes_read == 0) break;
+
+            const buffer = client.connection.?.read_buffer[0..bytes_read];
+            const header = try packet.FixedHeader.parse(buffer);
+
+            if (header.packet_type == .PUBLISH) {
+                const pub_pkt = try client.parser.parsePublish(buffer);
+                if (std.mem.eql(u8, pub_pkt.topic, "$SYS/discovery/response")) {
+                    std.debug.print("📥 Received Discovery Response ({d} bytes)\n", .{pub_pkt.payload.len});
+
+                    if (proto_dir) |dir_path| {
+                        var registry = pb_registry.SchemaRegistry.init(allocator);
+                        defer registry.deinit();
+
+                        var dir = try std.fs.cwd().openDir(dir_path, .{ .iterate = true });
+                        defer dir.close();
+                        var it = dir.iterate();
+                        while (try it.next()) |entry| {
+                            if (entry.kind == .file and std.mem.endsWith(u8, entry.name, ".proto")) {
+                                const content = try dir.readFileAlloc(allocator, entry.name, 1024 * 1024);
+                                defer allocator.free(content);
+                                var p = pb_parser.ProtoParser.init(allocator, content);
+                                try p.parse(&registry);
+                            }
+                        }
+
+                        if (registry.getMessage("ServiceDiscoveryResponse")) |schema| {
+                            var decoder = pb_decoder.Decoder.init(allocator, pub_pkt.payload);
+                            var val = try decoder.decodeMessage(schema, &registry);
+                            defer val.deinit(allocator);
+                            std.debug.print("Services:\n", .{});
+                            val.debugPrint();
+                            std.debug.print("\n", .{});
+                        } else {
+                            std.debug.print("⚠ 'ServiceDiscoveryResponse' schema not found in provided --proto-dir\n", .{});
+                        }
+                    } else {
+                        std.debug.print("⚠ --proto-dir not provided, cannot decode response.\n", .{});
+                    }
+                    break;
+                }
+            }
+        }
         try client.disconnect();
     } else {
         std.debug.print("Unknown command: {s}\n", .{command});

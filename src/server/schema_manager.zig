@@ -60,4 +60,46 @@ pub const SchemaManager = struct {
         }
         return null;
     }
+
+    pub fn getDiscoveryValue(self: *SchemaManager, allocator: std.mem.Allocator) !pb_types.ProtoValue {
+        var root_map = std.AutoHashMap(u32, pb_types.ProtoValue).init(allocator);
+        // We use a simple errdefer approach: if we fail before returning,
+        // we might leak partial structures if we are not careful.
+        // For simplicity in this step, we assume allocs succeed or we accept leak on crash for now (MVP).
+        // specific cleanups would be verbose.
+
+        var schemas_list = std.ArrayListUnmanaged(*pb_types.ProtoValue){};
+
+        var it = self.topic_mapping.iterator();
+        while (it.next()) |entry| {
+            const topic = entry.key_ptr.*;
+            const msg_type = entry.value_ptr.*;
+
+            var info_map = std.AutoHashMap(u32, pb_types.ProtoValue).init(allocator);
+
+            // Tag 1: topic
+            const topic_copy = try allocator.dupe(u8, topic);
+            try info_map.put(1, .{ .bytes = topic_copy });
+
+            // Tag 2: message_type
+            const type_copy = try allocator.dupe(u8, msg_type);
+            try info_map.put(2, .{ .bytes = type_copy });
+
+            // Tag 3: schema_source
+            if (self.registry.getMessage(msg_type)) |def| {
+                const source_copy = try allocator.dupe(u8, def.source_code);
+                // std.debug.print("DEBUG: Found schema for {s}, source len: {d}\n", .{ msg_type, def.source_code.len });
+                try info_map.put(3, .{ .bytes = source_copy });
+            }
+
+            const info_ptr = try allocator.create(pb_types.ProtoValue);
+            info_ptr.* = .{ .message = info_map };
+
+            try schemas_list.append(allocator, info_ptr);
+        }
+
+        try root_map.put(1, .{ .repeated = schemas_list });
+
+        return pb_types.ProtoValue{ .message = root_map };
+    }
 };

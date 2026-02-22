@@ -23,7 +23,7 @@ if ! ps -p $SERVER_PID > /dev/null; then
 fi
 
 echo "🧪 Running Python Pub/Sub Test..."
-python3 tests/pubsub_test.py
+python3 tests/cases/pubsub_test.py
 EXIT_CODE=$?
 
 echo ""

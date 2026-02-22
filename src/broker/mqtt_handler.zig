@@ -5,6 +5,7 @@ const TopicBroker = @import("broker.zig").TopicBroker;
 const Connection = @import("../common/connection.zig").Connection;
 const SchemaManager = @import("../server/schema_manager.zig").SchemaManager;
 const pb_decoder = @import("../protocol/protobuf/decoder.zig");
+const pb_encoder = @import("../protocol/protobuf/encoder.zig");
 
 /// MQTT Session state for a client
 pub const Session = struct {
@@ -110,6 +111,11 @@ pub const MqttHandler = struct {
     fn handlePublish(self: *MqttHandler, conn: *Connection, client_index: usize, buffer: []const u8, broker: *TopicBroker, connections: []?*Connection, schema_manager: *SchemaManager) !void {
         _ = conn;
         const publish_packet = try self.parser.parsePublish(buffer);
+
+        if (std.mem.eql(u8, publish_packet.topic, "$SYS/discovery/request")) {
+            try self.handleDiscoveryRequest(broker, schema_manager, connections);
+            return;
+        }
 
         std.debug.print("← PUBLISH to '{s}' ({d} bytes)\n", .{ publish_packet.topic, publish_packet.payload.len });
 
@@ -228,5 +234,64 @@ pub const MqttHandler = struct {
         broker.removeClient(client_index);
 
         conn.state = .disconnecting;
+    }
+
+    fn handleDiscoveryRequest(self: *MqttHandler, broker: *TopicBroker, schema_manager: *SchemaManager, connections: []?*Connection) !void {
+        std.debug.print("  [Discovery] Received request\n", .{});
+
+        // 1. Get the response value
+        var value = schema_manager.getDiscoveryValue(self.allocator) catch |err| {
+            std.debug.print("  [Discovery] Failed to build response value: {}\n", .{err});
+            return;
+        };
+        defer value.deinit(self.allocator);
+
+        // 2. Get the schema
+        const schema = schema_manager.registry.getMessage("ServiceDiscoveryResponse");
+        if (schema == null) {
+            std.debug.print("  [Discovery] ⚠ Schema 'ServiceDiscoveryResponse' not found!\n", .{});
+            return;
+        }
+
+        // 3. Encode Protobuf
+        var encoder = pb_encoder.Encoder.init(self.allocator, &schema_manager.registry);
+        const pb_payload = try encoder.encode(value, schema.?);
+        defer self.allocator.free(pb_payload);
+
+        // 4. Create response packet
+        const response_topic = "$SYS/discovery/response";
+        const pub_packet = packet.PublishPacket{
+            .topic = response_topic,
+            .qos = .at_most_once,
+            .retain = false,
+            .dup = false,
+            .packet_id = null,
+            .payload = pb_payload,
+        };
+
+        // 5. Encode MQTT Packet
+        const total_size = pb_payload.len + response_topic.len + 20; // Safe buffer margin
+        const msg_buffer = try self.allocator.alloc(u8, total_size);
+        defer self.allocator.free(msg_buffer);
+
+        const written = try pub_packet.encode(msg_buffer);
+        const bytes_to_send = msg_buffer[0..written];
+
+        // 6. Send to subscribers
+        var subscribers = try broker.getSubscribers(response_topic, self.allocator);
+        defer subscribers.deinit(self.allocator);
+
+        std.debug.print("  [Discovery] Sending response to {} subscriber(s)\n", .{subscribers.items.len});
+
+        for (subscribers.items) |sub_index| {
+            if (sub_index < connections.len) {
+                if (connections[sub_index]) |sub_conn| {
+                    _ = sub_conn.write(bytes_to_send) catch |err| {
+                        std.debug.print("  ⚠ Failed to send discovery to client {}: {}\n", .{ sub_index, err });
+                        continue;
+                    };
+                }
+            }
+        }
     }
 };
