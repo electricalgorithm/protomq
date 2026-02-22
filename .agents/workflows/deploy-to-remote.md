@@ -30,16 +30,17 @@ This workflow guides agents on how to deploy the ProtoMQ server to a remote mach
    ssh <ssh_target> "cd /opt/protomq && git checkout <branch_name> && git pull"
    ```
 
-4. **Build the Application**:
-   Build the Zig application on the remote server using the located `zig` binary. Ensure you build with the `-Dadmin_server=true` flag to enable the Admin Server API.
+4. **Build and Install the Application**:
+   Build the Zig application on the remote server using the located `zig` binary. Ensure you build with the `-Dadmin_server=true` flag.
+   Use the `--prefix /opt/protomq` flag so that it installs the `bin/` files and the systemd service file into `/opt/protomq`.
    ```bash
-   ssh <ssh_target> "cd /opt/protomq && <path_to_zig_binary> build -Doptimize=ReleaseSafe -Dadmin_server=true"
+   ssh <ssh_target> "cd /opt/protomq && sudo <path_to_zig_binary> build -Doptimize=ReleaseSafe -Dadmin_server=true --prefix /opt/protomq"
    ```
 
 5. **Configure systemd Service**:
-   The `protomq.service` file is included in the `deploy/systemd/` directory of the repository. Copy it to the systemd directory and enable it.
+   Since the build step installed the service file directly into `/opt/protomq/etc/systemd/system/protomq.service`, simply link it to the system bus, reload, and start it.
    ```bash
-   ssh <ssh_target> "sudo cp /opt/protomq/deploy/systemd/protomq.service /etc/systemd/system/protomq.service && sudo systemctl daemon-reload && sudo systemctl enable --now protomq && sudo systemctl restart protomq"
+   ssh <ssh_target> "sudo ln -sf /opt/protomq/etc/systemd/system/protomq.service /etc/systemd/system/protomq.service && sudo systemctl daemon-reload && sudo systemctl enable --now protomq && sudo systemctl restart protomq"
    ```
 
 6. **Verify Service Status**:
