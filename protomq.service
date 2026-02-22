@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=user
-WorkingDirectory=/home/user/protomq
-ExecStart=/home/user/protomq/zig-out/bin/protomq-server
+User=root
+WorkingDirectory=/opt/protomq
+ExecStart=/opt/protomq/zig-out/bin/protomq-server
 Restart=always
 RestartSec=5
 
