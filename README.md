@@ -58,6 +58,14 @@ protomq-cli discover --proto-dir schemas
 ```
 This allows clients to "bootstrap" themselves without needing pre-shared `.proto` files.
 
+### Admin Server
+
+ProtoMQ includes an optional HTTP Admin Server for runtime observability and dynamic schema management without polluting the core MQTT hot-paths.
+
+- **Dynamic Schema Registration**: Register `.proto` files at runtime via `POST /api/v1/schemas`.
+- **Telemetry**: Monitor active connections, message throughput, and schemas via `GET /metrics`.
+- **Zero Overhead Footprint**: The Admin Server is disabled by default to preserve the absolute minimum memory footprint for embedded devices. It is strictly conditionally compiled via the `zig build -Dadmin_server=true` flag. Enabling it moderately increases the initial static memory baseline (e.g., from ~2.6 MB to ~4.0 MB) by safely running a parallel HTTP listener, but it executes cooperatively on the same event loop ensuring zero degradation to per-message MQTT performance. When the flag is deactivated, it incurs **zero overhead footprint**.
+
 ### Performance Results
 
 ProtoMQ delivers high performance across both high-end and edge hardware:
