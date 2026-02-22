@@ -56,9 +56,9 @@ This workflow guides agents on how to deploy the ProtoMQ server to a remote mach
 Send a ProtoMQ request from the **host machine** (the machine you are running on) to the remote machine to verify basic functionality using the `protomq-cli` tool.
 First, build the project locally if necessary, then run the CLI (ensure you use the correct IP/host of the remote machine).
 ```bash
-./zig-out/bin/protomq-cli --host <remote_host>
+./zig-out/bin/protomq-cli connect --host <remote_host>
 ```
-*(Provide the correct arguments for publishing/subscribing to test the connection).*
+*(You can also use `publish` or `subscribe` commands with `-t <topic>` to test actual message flow).*
 
 ### 2. Admin Server Validation
 If the Admin Server is enabled, it will listen on `127.0.0.1:8080` on the remote server. Validate the endpoints directly on the remote machine over SSH using the default authorization token (`admin_secret` or check `ADMIN_TOKEN`):
