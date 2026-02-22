@@ -37,9 +37,9 @@ This workflow guides agents on how to deploy the ProtoMQ server to a remote mach
    ```
 
 5. **Configure systemd Service**:
-   The `protomq.service` file is included in the root of the repository. Copy it to the systemd directory and enable it.
+   The `protomq.service` file is included in the `deploy/systemd/` directory of the repository. Copy it to the systemd directory and enable it.
    ```bash
-   ssh <ssh_target> "sudo cp /opt/protomq/protomq.service /etc/systemd/system/protomq.service && sudo systemctl daemon-reload && sudo systemctl enable --now protomq && sudo systemctl restart protomq"
+   ssh <ssh_target> "sudo cp /opt/protomq/deploy/systemd/protomq.service /etc/systemd/system/protomq.service && sudo systemctl daemon-reload && sudo systemctl enable --now protomq && sudo systemctl restart protomq"
    ```
 
 6. **Verify Service Status**:
