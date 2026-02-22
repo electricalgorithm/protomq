@@ -37,10 +37,10 @@ zig build test
 
 # Run integration tests
 zig build && \
-./tests/cli_test.sh && \
-./tests/integration_test.sh && \
-./tests/run_pubsub_test.sh && \
-./tests/discovery_test.sh
+./tests/cases/cli_test.sh && \
+./tests/cases/integration_test.sh && \
+./tests/cases/run_pubsub_test.sh && \
+./tests/cases/discovery_test.sh
 ```
 
 ### Limitations
