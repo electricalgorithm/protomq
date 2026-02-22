@@ -35,6 +35,15 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(client_exe);
 
+    // Install systemd service if building for Linux
+    if (target.result.os.tag == .linux) {
+        b.getInstallStep().dependOn(&b.addInstallFileWithDir(
+            b.path("deploy/systemd/protomq.service"),
+            .prefix,
+            "etc/systemd/system/protomq.service",
+        ).step);
+    }
+
     // Run command for server
     const run_server_cmd = b.addRunArtifact(server_exe);
     run_server_cmd.step.dependOn(b.getInstallStep());
