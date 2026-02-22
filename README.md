@@ -39,7 +39,8 @@ zig build test
 zig build && \
 ./tests/cli_test.sh && \
 ./tests/integration_test.sh && \
-./tests/run_pubsub_test.sh
+./tests/run_pubsub_test.sh && \
+./tests/discovery_test.sh
 ```
 
 ### Limitations
