@@ -81,7 +81,9 @@ pub const MessageDefinition = struct {
 pub const ProtoValue = union(enum) {
     varint: u64,
     fixed64: u64,
+    float64: f64,
     fixed32: u32,
+    float32: f32,
     bytes: []u8, // string or bytes
     message: std.AutoHashMap(u32, ProtoValue), // nested message
     repeated: std.ArrayListUnmanaged(*ProtoValue), // repeated field (pointers to break recursion, unmanaged to fix compilation)
@@ -115,7 +117,9 @@ pub const ProtoValue = union(enum) {
         switch (self) {
             .varint => |v| std_debug.print("{d}", .{v}),
             .fixed64 => |v| std_debug.print("{d}", .{v}),
+            .float64 => |v| std_debug.print("{d:.6}", .{v}),
             .fixed32 => |v| std_debug.print("{d}", .{v}),
+            .float32 => |v| std_debug.print("{d:.6}", .{v}),
             .bytes => |b| {
                 std_debug.print("\"", .{});
                 for (b) |c| {
