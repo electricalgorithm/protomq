@@ -296,7 +296,7 @@
         <div class="header-meta">
             <a href="https://github.com/electricalgorithm/protomq" class="btn btn-primary">GitHub</a>
             <a href="FAQ.html" class="btn btn-ghost">FAQ</a>
-            <span class="tag">v0.1.0-dev · Zig 0.15.2+</span>
+            <span class="tag" id="version-tag">dev · Zig 0.15.2+</span>
         </div>
     </header>
 
@@ -487,6 +487,16 @@ curl -s -H "Authorization: Bearer admin_secret" http://127.0.0.1:8080/metrics
         </p>
     </footer>
 
+    <script>
+        fetch('https://api.github.com/repos/electricalgorithm/protomq/tags')
+            .then(r => r.ok ? r.json() : Promise.reject())
+            .then(tags => {
+                if (tags.length > 0) {
+                    document.getElementById('version-tag').textContent = tags[0].name + ' · Zig 0.15.2+';
+                }
+            })
+            .catch(() => { /* keep the fallback text */ });
+    </script>
 </body>
 
 </html>
