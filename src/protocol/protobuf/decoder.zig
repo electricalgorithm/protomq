@@ -75,8 +75,18 @@ pub const Decoder = struct {
                 const val = try self.readVarint();
                 return types.ProtoValue{ .varint = val };
             },
+            .Fixed32 => {
+                const val = try self.readFixed32();
+                if (field.type == .Float) {
+                    return types.ProtoValue{ .float32 = @bitCast(val) };
+                }
+                return types.ProtoValue{ .fixed32 = val };
+            },
             .Fixed64 => {
                 const val = try self.readFixed64();
+                if (field.type == .Double) {
+                    return types.ProtoValue{ .float64 = @bitCast(val) };
+                }
                 return types.ProtoValue{ .fixed64 = val };
             },
             .LengthDelimited => {
@@ -108,10 +118,6 @@ pub const Decoder = struct {
                     // Treat as bytes if packing not supported/known
                     return types.ProtoValue{ .bytes = try self.allocator.dupe(u8, data) };
                 }
-            },
-            .Fixed32 => {
-                const val = try self.readFixed32();
-                return types.ProtoValue{ .fixed32 = val };
             },
             else => return DecoderError.UnsupportedWireType,
         }

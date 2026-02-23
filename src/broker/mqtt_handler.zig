@@ -155,6 +155,7 @@ pub const MqttHandler = struct {
                             std.debug.print("  ⚠ Failed to forward to client {}: {}\n", .{ sub_index, err });
                             continue;
                         };
+                        broker.total_messages_routed += 1;
                         std.debug.print("  → Forwarded to client {}\n", .{sub_index});
                     }
                 }

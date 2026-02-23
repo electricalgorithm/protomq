@@ -155,8 +155,8 @@ pub const MqttClient = struct {
     }
 
     /// Loop to receive messages (Blocking)
-    /// Calls callback with (topic, message)
-    pub fn run(self: *MqttClient, callback: *const fn (topic: []const u8, message: []const u8) void) !void {
+    /// Calls callback with (context, topic, message)
+    pub fn run(self: *MqttClient, context: *anyopaque, callback: *const fn (ctx: *anyopaque, topic: []const u8, message: []const u8) void) !void {
         if (self.connection == null) return error.NotConnected;
 
         while (self.connection.?.isActive()) {
@@ -175,7 +175,7 @@ pub const MqttClient = struct {
                 // Use parser to parse PUBLISH packet
                 // Parser.parsePublish works for incoming PUBLISH
                 const publish_pkt = try self.parser.parsePublish(buffer);
-                callback(publish_pkt.topic, publish_pkt.payload);
+                callback(context, publish_pkt.topic, publish_pkt.payload);
             } else if (header.packet_type == .PINGRESP) {
                 // Ignore
             }
