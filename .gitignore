@@ -36,3 +36,6 @@ coverage/
 # Dependency cache
 deps/
 vendor/
+
+# Blog drafts (not part of the repo)
+.blog/
