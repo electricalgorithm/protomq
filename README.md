@@ -12,14 +12,12 @@
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#why-protomq">Why ProtoMQ</a> •
-  <a href="#architecture">Architecture</a> •
   <a href="#performance">Performance</a> •
+  <a href="FEATURES.md">Features</a> •
   <a href="FAQ.md">FAQ</a>
 </p>
 
 ---
-
-## What It Does
 
 ProtoMQ is an MQTT broker that enforces **Protobuf schemas at the broker level**. Clients publish JSON; the broker validates, encodes to Protobuf, and routes compact binary payloads to subscribers. No code generation, no `.proto` compilation step on the client side.
 
@@ -27,113 +25,79 @@ ProtoMQ is an MQTT broker that enforces **Protobuf schemas at the broker level**
   <img src="assets/terminal_demo.svg" alt="ProtoMQ terminal demo" width="780px" />
 </p>
 
-- **Schema-enforced messaging** — `.proto` files define the contract. Malformed payloads are rejected *before* they reach subscribers.
-- **Custom Protobuf engine** — written from scratch in Zig. Runtime `.proto` parsing with zero external dependencies.
-- **Wildcard topic routing** — full MQTT `+` and `#` wildcard support with O(1) matching via a trie-based topic broker.
-- **Service Discovery** — clients query `$SYS/discovery/request` to discover available topics and download schemas automatically. No pre-shared `.proto` files needed.
+- **Schema-enforced messaging** — `.proto` files define the contract. Malformed payloads get rejected *before* they reach subscribers.
+- **Custom Protobuf engine** — written from scratch in Zig. Runtime `.proto` parsing, zero external dependencies.
+- **Wildcard topic routing** — full MQTT `+` and `#` wildcard support via a trie-based topic broker.
+- **Service Discovery** — clients query `$SYS/discovery/request` to discover topics and download schemas on the fly. No pre-shared `.proto` files needed.
+- **Optional Admin HTTP API** — register new schemas and topic mappings at runtime, monitor connections and throughput. Disabled by default, zero overhead when off. See [FEATURES.md](FEATURES.md) for details.
 - **Runs in 2.6 MB** — the entire broker with 100 active connections fits in under 3 MB of memory.
 
 ---
 
-## Why ProtoMQ
+### Why ProtoMQ
 
-Every IoT team eventually faces the same problem: JSON payloads are readable but *wasteful*. A 12-field sensor reading that takes 310 bytes in JSON compresses to 82 bytes in Protobuf — that's a **74% reduction** in bandwidth, which directly translates to lower radio usage, longer battery life, and cheaper data plans for cellular-connected devices.
+If you've worked with IoT sensor fleets, you've probably been through this: you start with JSON over MQTT because it's easy to debug, every language has a parser, and `mosquitto_sub` lets you eyeball what's going on. It works fine... until you start caring about bandwidth.
+
+A 12-field sensor reading weighs around 310 bytes in JSON. The same data in Protobuf: 82 bytes. On a cellular-connected device pushing telemetry every 5 seconds, that gap adds up to roughly 1.6 MB/day per device — multiply by a few thousand devices and the data bill starts hurting.
 
 <p align="center">
   <img src="assets/payload_comparison.svg" alt="JSON vs Protobuf payload size comparison" width="680px" />
 </p>
 
-But switching to Protobuf introduces its own headache: you need code generation, language-specific stubs, and a way to keep producers and consumers in sync when schemas change. ProtoMQ removes that friction:
+But switching to Protobuf means you need code generation per language, keeping stubs in sync across firmware versions, and losing the ability to just read your payloads. ProtoMQ sits in the middle: producers send plain JSON, the broker handles encoding, and subscribers get compact Protobuf. The schema lives in one place and the broker enforces it.
 
-| Concern | Plain MQTT + JSON | ProtoMQ |
+| | Plain MQTT + JSON | ProtoMQ |
 |---|---|---|
 | Schema enforcement | None — anything goes | Validated at every `PUBLISH` |
-| Payload format | JSON (~170 bytes for 8 fields) | Protobuf (~48 bytes) |
-| Client bootstrap | Pre-shared docs, out-of-band | Built-in Service Discovery |
-| Code generation | Required per language | Not needed — send JSON, receive Protobuf |
-| Observability | Roll your own | Admin HTTP API included |
+| Payload format | JSON (~170 bytes, 8 fields) | Protobuf (~48 bytes) |
+| Client bootstrap | Pre-shared docs | Built-in Service Discovery |
+| Code generation | Required per language | Not needed |
 
 ---
 
-## Architecture
+### Under the Hood
 
-```mermaid
-graph LR
-    subgraph Clients
-        P[Producer<br/>sends JSON]
-        S1[Subscriber 1]
-        S2[Subscriber 2]
-    end
+ProtoMQ is not a wrapper around an existing broker — it's a ground-up implementation. Here's what makes it tick:
 
-    subgraph ProtoMQ Broker
-        TCP[TCP Listener<br/>epoll / kqueue]
-        MP[MQTT Parser<br/>v3.1.1]
-        PB[Protobuf Engine<br/>validate + encode]
-        TB[Topic Broker<br/>wildcard trie]
-        SR[Schema Registry<br/>.proto files]
-    end
-
-    P -->|MQTT CONNECT + PUBLISH| TCP
-    TCP --> MP
-    MP --> PB
-    PB -->|lookup| SR
-    PB -->|binary payload| TB
-    TB --> S1
-    TB --> S2
-
-    style PB fill:#58a6ff,color:#0d1117
-    style SR fill:#3fb950,color:#0d1117
-    style TB fill:#f97316,color:#0d1117
-```
-
-The broker is a single-threaded event loop built on `epoll` (Linux) or `kqueue` (macOS). There are no hidden allocations, no garbage collector, and no runtime — just Zig's `std.mem.Allocator` with explicit control over every byte.
-
-The Protobuf engine parses `.proto` files at startup (or at runtime via the Admin API) and builds an in-memory schema registry. When a PUBLISH arrives, the engine validates the JSON payload against the registered schema, encodes it to Protobuf wire format, and hands the compact binary to the topic broker for fan-out.
+- **`epoll` / `kqueue` event loop** — single-threaded, no abstraction layer. The network layer talks directly to the OS kernel I/O primitives. On Linux that's `epoll`, on macOS `kqueue`. No libuv, no tokio, no hidden threads.
+- **One allocator, full control** — every allocation goes through Zig's `std.mem.Allocator`. No GC, no hidden heap churn, no runtime. You can trace every byte the broker touches.
+- **Zero third-party dependencies** — the MQTT parser, TCP connection handler, Protobuf wire format encoder, `.proto` file parser — all written in Zig using only the standard library. `build.zig.zon` has an empty `dependencies` block.
+- **Runtime schema registry** — `.proto` files are parsed at startup and mapped to MQTT topics. With the Admin Server enabled, you can register new schemas and mappings at runtime over HTTP without restarting the broker.
+- **Comptime-generated lookup tables** — the MQTT packet parser uses Zig's `comptime` to build dispatch tables at compile time. No branching, no hash maps — just array indexing.
+- **Cross-compilation** — `zig build -Dtarget=aarch64-linux` produces a Raspberry Pi binary from a Mac. One command, no toolchain headaches.
 
 ---
 
-## Quick Start
+### Quick Start
 
-### Docker (recommended for trying it out)
+**Docker:**
 
 ```bash
 docker compose up
 ```
 
-The server starts on port `1883` with the schemas from the `schemas/` directory. Connect with any MQTT client.
+The server starts on port `1883` with the schemas from `schemas/`. Connect with any MQTT client.
 
-### Build from source
-
-Requires [Zig 0.15.2+](https://ziglang.org/download/).
+**From source** (requires [Zig 0.15.2+](https://ziglang.org/download/)):
 
 ```bash
 git clone https://github.com/electricalgorithm/protomq.git
 cd protomq
-
-# Build and run the server
 zig build run-server
+```
 
+```bash
 # In another terminal — publish a JSON message
 zig build run-client -- publish --topic sensors/temp \
   --json '{"device_id":"s-042","temperature":22.5,"humidity":61,"timestamp":1706140800}'
 
-# In another terminal — subscribe to all sensor topics
+# In another terminal — subscribe
 zig build run-client -- subscribe --topic "sensors/#"
-```
-
-### Run tests
-
-```bash
-# Unit tests
-zig build test
-
-# Full integration suite
-./tests/run_all.sh
 ```
 
 ---
 
-## Performance
+### Performance
 
 ProtoMQ handles **208,000 messages/second** on an Apple M2 Pro and **147,000 msg/s** on a Raspberry Pi 5 — with sub-millisecond p99 latency and no memory leaks across 100,000 connection cycles.
 
@@ -147,69 +111,14 @@ ProtoMQ handles **208,000 messages/second** on an Apple M2 Pro and **147,000 msg
 | **Connection churn** (100k cycles) | 1,496 conn/s | 1,548 conn/s |
 | **Memory leaks** | 0 MB | 0 MB |
 
-All benchmarks run on loopback, `ReleaseSafe` mode, Zig 0.15.2. Methodology and raw JSON results: [`benchmarks/`](benchmarks/README.md).
+All benchmarks run on loopback, `ReleaseSafe` mode, Zig 0.15.2. Methodology and raw results: [`benchmarks/`](benchmarks/README.md).
 
 ---
 
-## Service Discovery
+### Current Limitations
 
-Clients can discover topics and download the associated `.proto` schemas without any out-of-band configuration:
+QoS 0 only (at most once delivery), no persistent sessions, no retained messages, single-node deployment. These are scope decisions for the initial release — multi-node and QoS 1/2 are on the roadmap.
 
-```bash
-protomq-cli discover --proto-dir schemas
-```
+### Contributing
 
-Under the hood, the client subscribes to `$SYS/discovery/request` and receives a `ServiceDiscoveryResponse` containing every registered topic-schema mapping including the full `.proto` source code. This lets new clients bootstrap themselves in a single round-trip.
-
----
-
-## Admin Server
-
-An optional HTTP server for runtime schema management and telemetry. Disabled by default — when the build flag is off, the code is stripped from the binary entirely (zero overhead, not just disabled).
-
-```bash
-# Enable at compile time
-zig build -Dadmin_server=true run-server
-```
-
-| Endpoint | Description |
-|---|---|
-| `GET /metrics` | Active connections, message throughput, loaded schemas |
-| `GET /api/v1/schemas` | Current topic-to-schema mappings |
-| `POST /api/v1/schemas` | Register a new `.proto` schema and topic mapping at runtime |
-
-All endpoints require `Authorization: Bearer <ADMIN_TOKEN>`. The Admin Server runs cooperatively on the same event loop — enabling it does not degrade MQTT performance.
-
-| Build | Memory baseline | Admin API |
-|---|---|---|
-| `zig build` | ~2.6 MB | ✗ |
-| `zig build -Dadmin_server=true` | ~4.0 MB | ✓ |
-
-For detailed usage including dynamic schema registration: [FAQ](FAQ.md).
-
----
-
-## Current Limitations
-
-- QoS 0 only (at most once delivery)
-- No persistent sessions
-- No retained messages
-- Single-node deployment
-
-These are scope decisions for the initial release, not fundamental limitations. Multi-node and QoS 1/2 are on the roadmap.
-
----
-
-## Contributing
-
-Contributions are welcome! This project is under active development — if you're interested in MQTT internals, Protobuf wire format, or systems programming in Zig, there's plenty to work on.
-
-## License
-
-MIT — see [LICENSE](LICENSE).
-
-## Resources
-
-- [Zig Documentation](https://ziglang.org/documentation/master/)
-- [MQTT v3.1.1 Specification](http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/mqtt-v3.1.1.html)
-- [Protocol Buffers](https://protobuf.dev/)
+Contributions are welcome. If you're interested in MQTT internals, Protobuf wire format, or systems programming in Zig, there's plenty to dig into. See [FEATURES.md](FEATURES.md) for the full feature set and [FAQ.md](FAQ.md) for deployment and configuration guides.
