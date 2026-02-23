@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benchmarking Suite · ProtoMQ</title>
+    <meta name="description"
+        content="The ProtoMQ Benchmarking Suite: A modular, project-agnostic framework for stress-testing MQTT brokers and network services." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #111;
+            --surface: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --dim: #888;
+            --accent: #5b8dee;
+            --green: #4caf87;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.65;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        header {
+            padding: 3.5rem 0 2.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -.02em;
+            color: #fff;
+        }
+
+        header p {
+            margin-top: .75rem;
+            color: var(--dim);
+            max-width: 620px;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: .45rem 1rem;
+            border-radius: 5px;
+            font-size: .85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: opacity .15s;
+        }
+
+        .btn:hover {
+            opacity: .8;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-ghost {
+            border: 1px solid var(--border);
+            color: var(--dim);
+            background: transparent;
+        }
+
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: .75rem 0;
+            display: flex;
+            gap: 1.5rem;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+        }
+
+        nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: .875rem;
+        }
+
+        nav a:hover {
+            color: var(--text);
+        }
+
+        section {
+            padding: 2.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin: 1.5rem 0 0.5rem;
+        }
+
+        p+p {
+            margin-top: .75rem;
+        }
+
+        p {
+            color: var(--dim);
+        }
+
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: .82rem;
+            line-height: 1.75;
+            color: #ccc;
+            margin-top: 1rem;
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: .85em;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: .1em .35em;
+            color: #ccc;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+        }
+
+        ul.bench-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        ul.bench-list li {
+            padding: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        ul.bench-list h4 {
+            color: #fff;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        ul.bench-list p {
+            font-size: 0.9rem;
+        }
+
+        .highlight {
+            color: var(--green);
+        }
+
+        footer {
+            padding-top: 2rem;
+            color: #555;
+            font-size: .8rem;
+        }
+
+        footer a {
+            color: #555;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--dim);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: var(--dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html" class="back-link">← Back to ProtoMQ</a>
+        <h1>Benchmarking Suite</h1>
+        <p>A comprehensive, modular stress-testing suite designed for high-performance MQTT brokers. Developed in Python
+            with <code style="border:none; background:transparent">uv</code>, it validates latency, concurrency, and
+            stability thresholds.</p>
+        <div class="header-meta">
+            <a href="https://github.com/electricalgorithm/protomq/tree/main/benchmarks" class="btn btn-primary">Source
+                Code</a>
+            <span class="tag">7 Automated Scenarios</span>
+        </div>
+    </header>
+
+    <nav>
+        <a href="#agnostic">Agnostic Stress Testing</a>
+        <a href="#suite">The Scenarios (B1 – B7)</a>
+        <a href="#infrastructure">Modern Python Infrastructure</a>
+        <a href="#thresholds">Thresholding &amp; Validation</a>
+    </nav>
+
+    <section id="agnostic">
+        <h2>Agnostic Stress Testing</h2>
+        <p>
+            The ProtoMQ Benchmarking Suite was built with a critical realization: <strong>performance validation is
+                universal.</strong> While developed alongside ProtoMQ, the suite is entirely decoupled from the server
+            implementation.
+        </p>
+        <p>
+            It uses standard MQTT protocols to interact with any broker, making it a valuable tool for testing
+            <em>any</em> MQTT implementation (Mosquitto, EMQX, Vernemq, etc.) against the same rigorous scenarios used
+            to optimize ProtoMQ.
+        </p>
+    </section>
+
+    <section id="suite">
+        <h2>The Scenarios (B1 – B7)</h2>
+        <p>Each benchmark targets a specific stress vector, from connection churn to payload size variance.</p>
+
+        <ul class="bench-list">
+            <li>
+                <h4>B1: Baseline Concurrency &amp; Latency</h4>
+                <p>Verifies sub-millisecond round-trip latency under steady-state load with 100+ concurrent connections.
+                </p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> p50/p99 Latency, Connection Time, Memory
+                    (RSS)
+                </p>
+            </li>
+            <li>
+                <h4>B2: Thundering Herd</h4>
+                <p>Simulates 10,000 clients connecting in bursts and publishing simultaneously. Tests massive fan-out
+                    and connection pressure.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> Fan-out Time, Connection Failures, Message
+                    Loss, Peak CPU/Memory
+                </p>
+            </li>
+            <li>
+                <h4>B3: Sustained Throughput</h4>
+                <p>10-minute endurance test at 10,000 msg/s. Monitors for long-term stability and performance
+                    degradation.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> Messages/sec, p99 Latency Stability, Memory
+                    Growth, Avg CPU
+                </p>
+            </li>
+            <li>
+                <h4>B4: Wildcard Subscription Explosion</h4>
+                <p>Stress-tests the topic matching engine with complex overlapping patterns like <code
+                        class="highlight">sensor/+/temp</code>.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> Topic Matching Latency (µs), Routing
+                    Correctness, Peak Memory
+                </p>
+            </li>
+            <li>
+                <h4>B5: Decoding Under Load</h4>
+                <p>Compares binary vs JSON processing overhead. Measures efficiency gains of the Protobuf layer.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> Bandwidth Savings %, Decoding Latency, CPU
+                    Overhead
+                </p>
+            </li>
+            <li>
+                <h4>B6: Connection Churn</h4>
+                <p>100,000 rapid connect/disconnect cycles. Essential for detecting socket leaks in edge/mobile
+                    scenarios.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> Connection Rate (conn/s), Memory Leak (MB),
+                    FD Leak Count
+                </p>
+            </li>
+            <li>
+                <h4>B7: Message Size Variations</h4>
+                <p>Tests performance across a spectrum of payloads, from 10-byte telemetry to 64KB binary images.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--dim);">
+                    <strong style="color: var(--accent);">Metrics:</strong> Throughput vs Size, p99 Latency per Size,
+                    Memory Scaling
+                </p>
+            </li>
+        </ul>
+    </section>
+
+    <section id="infrastructure">
+        <h2>Modern Python Infrastructure</h2>
+        <p>
+            The suite leverages <strong>Python 3.11+</strong> and the <strong>uv</strong> package manager for
+            lightning-fast environment setup and execution.
+        </p>
+        <h3>Modular Design</h3>
+        <p>A <code class="highlight">common/</code> library provides shared logic for connection tracking, resource
+            monitoring (CPU/Memory), and a standardized <code class="highlight">BenchmarkRunner</code>. This allows new
+            scenarios to be added by writing only the logic for the specific test case.</p>
+    </section>
+
+    <section id="thresholds">
+        <h2>Thresholding &amp; Validation</h2>
+        <p>
+            Raw performance numbers are only useful if they can be measured against expectations. The suite includes a
+            sophisticated <strong>Thresholding Mechanism</strong> that converts bench results into actionable status
+            reports.
+        </p>
+
+        <h3>Direction-Aware Validation</h3>
+        <p>
+            Every metric is defined with a target "direction" (lower is better for latency, higher is better for
+            throughput). The <code class="highlight">ThresholdChecker</code> automatically interprets the results based
+            on these semantics.
+        </p>
+
+        <ul class="bench-list" style="background:transparent; border:none; padding:0">
+            <li style="margin-bottom:0.5rem">
+                <span style="color:var(--green)">●</span> <strong>PASS:</strong> Metric meets the strict performance
+                target.
+            </li>
+            <li style="margin-bottom:0.5rem">
+                <span style="color:#e8a87c">●</span> <strong>WARN:</strong> Metric is within acceptable limits but
+                approaching the maximum (e.g., latency spikes).
+            </li>
+            <li style="margin-bottom:0.5rem">
+                <span style="color:#ef5350">●</span> <strong>FAIL:</strong> Metric exceeds the defined safety threshold,
+                indicating a regression.
+            </li>
+        </ul>
+
+        <h3>CI/CD Implementation</h3>
+        <p>
+            Because thresholds are declared in <code class="highlight">thresholds.json</code> files, the suite is ideal
+            for CI/CD pipelines. A build can be automatically failed if a commit introduces a performance regression,
+            ensuring the "sub-millisecond" promise of ProtoMQ is never broken.
+        </p>
+
+        <pre><code># Examples of threshold definitions
+{
+    "p99_latency_ms": { "max": 0.8, "warn": 0.6, "direction": "lower" },
+    "concurrent_connections": { "min": 9500, "direction": "higher" }
+}</code></pre>
+    </section>
+
+    <footer>
+        <p>
+            MIT License ·
+            <a href="https://github.com/electricalgorithm/protomq">github.com/electricalgorithm/protomq</a> ·
+            <a href="benchmarking.html">Benchmarks</a> ·
+            <a href="https://github.com/electricalgorithm/protomq/blob/main/FAQ.md">FAQ</a>
+        </p>
+    </footer>
+
+</body>
+
+</html>
