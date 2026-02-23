@@ -227,6 +227,20 @@ pub fn main() !void {
                 std.debug.print("✅ Loaded {d} mappings.\n", .{sub_ctx.topic_mapping.count()});
             }
 
+            // If --type is given, directly register the subscribed topic→type mapping
+            // (overrides / supplements discovery, useful when server doesn't advertise this topic)
+            if (proto_type) |msg_type| {
+                // Only load schemas from dir when proto-dir is set but we skipped discovery
+                if (proto_dir == null) {
+                    std.debug.print("⚠ --type requires --proto-dir to load schemas. Ignoring --type.\n", .{});
+                } else {
+                    const topic_key = try allocator.dupe(u8, topic);
+                    const type_val = try allocator.dupe(u8, msg_type);
+                    try sub_ctx.topic_mapping.put(topic_key, type_val);
+                    std.debug.print("📌 Forced mapping: '{s}' → '{s}'\n", .{ topic, msg_type });
+                }
+            }
+
             try client.run(&sub_ctx, onMessage);
         } else {
             std.debug.print("Error: --topic is required for subscribe\n", .{});
