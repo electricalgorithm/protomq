@@ -1,582 +1,492 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ProtoMQ — Type-Safe MQTT with Protobuf</title>
-  <meta name="description" content="ProtoMQ is a high-performance MQTT broker that enforces Protobuf schemas at the broker layer. Stop sending bloated JSON over the wire." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProtoMQ</title>
+    <meta name="description"
+        content="ProtoMQ is an MQTT 3.1.1 broker that parses and validates Protobuf payloads at the broker layer." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    :root {
-      --bg:        #0d0f14;
-      --surface:   #13161e;
-      --border:    #1e2330;
-      --accent:    #6c8eff;
-      --accent2:   #a78bfa;
-      --green:     #34d399;
-      --muted:     #6b7280;
-      --text:      #e2e8f0;
-      --text-dim:  #94a3b8;
-      --radius:    12px;
-      --font:      'Inter', sans-serif;
-      --mono:      'JetBrains Mono', monospace;
-    }
+        :root {
+            --bg: #111;
+            --surface: #1a1a1a;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --dim: #888;
+            --accent: #5b8dee;
+            /* one flat blue, no gradient */
+            --green: #4caf87;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+        }
 
-    html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.65;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
+        /* ─── Header ─── */
+        header {
+            padding: 3.5rem 0 2.5rem;
+            border-bottom: 1px solid var(--border);
+        }
 
-    /* ── Nav ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 clamp(1.5rem, 5vw, 4rem);
-      height: 60px;
-      background: rgba(13,15,20,.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-weight: 700; font-size: 1.1rem; letter-spacing: -.02em;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .nav-links { display: flex; gap: 2rem; }
-    .nav-links a {
-      color: var(--text-dim); text-decoration: none; font-size: .9rem; font-weight: 500;
-      transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-cta {
-      background: var(--accent); color: #fff !important;
-      padding: .4rem 1rem; border-radius: 6px; font-size: .875rem !important;
-      transition: opacity .2s !important;
-    }
-    .nav-cta:hover { opacity: .85; }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -.02em;
+            color: #fff;
+        }
 
-    /* ── Hero ── */
-    .hero {
-      display: flex; flex-direction: column; align-items: center;
-      text-align: center;
-      padding: 6rem clamp(1.5rem, 5vw, 4rem) 5rem;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(108,142,255,.12) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: .5rem;
-      background: rgba(108,142,255,.1); border: 1px solid rgba(108,142,255,.25);
-      color: var(--accent); padding: .3rem .9rem; border-radius: 999px;
-      font-size: .8rem; font-weight: 600; letter-spacing: .04em;
-      margin-bottom: 1.75rem;
-      animation: fadeUp .6s ease both;
-    }
-    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
-    .hero h1 {
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      font-weight: 700; line-height: 1.15; letter-spacing: -.03em;
-      max-width: 780px;
-      animation: fadeUp .6s .1s ease both;
-    }
-    .hero h1 em {
-      font-style: normal;
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .hero-sub {
-      margin-top: 1.25rem; max-width: 560px;
-      color: var(--text-dim); font-size: 1.1rem;
-      animation: fadeUp .6s .2s ease both;
-    }
-    .hero-actions {
-      display: flex; gap: 1rem; margin-top: 2.25rem; flex-wrap: wrap; justify-content: center;
-      animation: fadeUp .6s .3s ease both;
-    }
-    .btn {
-      display: inline-flex; align-items: center; gap: .5rem;
-      padding: .75rem 1.5rem; border-radius: 8px;
-      font-weight: 600; font-size: .95rem; text-decoration: none;
-      transition: transform .15s, opacity .15s;
-    }
-    .btn:hover { transform: translateY(-1px); opacity: .9; }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-outline {
-      border: 1px solid var(--border); color: var(--text-dim);
-      background: var(--surface);
-    }
+        header p {
+            margin-top: .75rem;
+            color: var(--dim);
+            max-width: 580px;
+        }
 
-    /* ── Stats strip ── */
-    .stats {
-      display: flex; justify-content: center; flex-wrap: wrap; gap: 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      margin: 0 clamp(1.5rem, 5vw, 4rem);
-      animation: fadeUp .6s .4s ease both;
-    }
-    .stat {
-      flex: 1 1 160px;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 1.75rem 1rem;
-      border-right: 1px solid var(--border);
-    }
-    .stat:last-child { border-right: none; }
-    .stat-value {
-      font-size: 2rem; font-weight: 700; letter-spacing: -.03em;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .stat-label { font-size: .8rem; color: var(--muted); margin-top: .2rem; text-align: center; }
+        .header-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
 
-    /* ── Section ── */
-    section { padding: 5rem clamp(1.5rem, 5vw, 4rem); max-width: 1100px; margin: 0 auto; }
-    .section-tag {
-      display: inline-block;
-      font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: .75rem;
-    }
-    .section-title {
-      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
-      font-weight: 700; letter-spacing: -.025em; line-height: 1.2;
-    }
-    .section-sub {
-      color: var(--text-dim); margin-top: .75rem; max-width: 560px; font-size: 1rem;
-    }
+        .btn {
+            display: inline-block;
+            padding: .45rem 1rem;
+            border-radius: 5px;
+            font-size: .85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: opacity .15s;
+        }
 
-    /* ── Features grid ── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      margin-top: 3rem;
-    }
-    .feature-card {
-      background: var(--surface);
-      padding: 1.75rem;
-      transition: background .2s;
-    }
-    .feature-card:hover { background: #161a24; }
-    .feature-icon {
-      width: 40px; height: 40px; border-radius: 8px;
-      background: rgba(108,142,255,.12);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem; margin-bottom: 1rem;
-    }
-    .feature-title { font-weight: 600; font-size: 1rem; margin-bottom: .4rem; }
-    .feature-desc { color: var(--text-dim); font-size: .9rem; line-height: 1.55; }
+        .btn:hover {
+            opacity: .8;
+        }
 
-    /* ── How it works / code ── */
-    .how-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
-      align-items: start; margin-top: 3rem;
-    }
-    @media (max-width: 720px) { .how-grid { grid-template-columns: 1fr; } }
-    .steps { display: flex; flex-direction: column; gap: 1.5rem; }
-    .step { display: flex; gap: 1rem; }
-    .step-num {
-      flex-shrink: 0;
-      width: 28px; height: 28px; border-radius: 50%;
-      background: rgba(108,142,255,.15); border: 1px solid rgba(108,142,255,.3);
-      color: var(--accent); font-size: .8rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .step-body h4 { font-size: .95rem; font-weight: 600; margin-bottom: .2rem; }
-    .step-body p { color: var(--text-dim); font-size: .9rem; }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
 
-    .code-block {
-      background: #0a0c10; border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-    }
-    .code-header {
-      display: flex; align-items: center; gap: .6rem;
-      padding: .7rem 1rem; border-bottom: 1px solid var(--border);
-      background: #0d0f14;
-    }
-    .code-dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-red   { background: #ff5f57; }
-    .dot-amber { background: #febc2e; }
-    .dot-green { background: #28c840; }
-    .code-filename { font-size: .78rem; color: var(--muted); margin-left: auto; font-family: var(--mono); }
-    pre {
-      padding: 1.25rem 1.25rem; overflow-x: auto;
-      font-family: var(--mono); font-size: .82rem; line-height: 1.7;
-      color: #c9d1d9;
-    }
-    .kw  { color: #79c0ff; }
-    .st  { color: #a5d6ff; }
-    .cm  { color: #6e7681; font-style: italic; }
-    .fn  { color: #d2a8ff; }
-    .nu  { color: #f0883e; }
-    .ty  { color: #ffa657; }
-    .hl  { color: var(--green); }
+        .btn-ghost {
+            border: 1px solid var(--border);
+            color: var(--dim);
+            background: transparent;
+        }
 
-    /* ── Comparison table ── */
-    .comparison-wrap { overflow-x: auto; margin-top: 2.5rem; }
-    table {
-      width: 100%; border-collapse: collapse;
-      font-size: .9rem;
-    }
-    thead tr { border-bottom: 1px solid var(--border); }
-    th {
-      text-align: left; padding: .85rem 1.1rem;
-      color: var(--text-dim); font-weight: 600; font-size: .8rem;
-      text-transform: uppercase; letter-spacing: .05em;
-    }
-    th:first-child { color: var(--text); }
-    td { padding: .85rem 1.1rem; border-bottom: 1px solid rgba(30,35,48,.6); }
-    tr:last-child td { border-bottom: none; }
-    td:first-child { color: var(--text-dim); }
-    .check { color: var(--green); font-size: 1.1rem; }
-    .cross { color: #6b7280; }
+        .tag {
+            font-size: .75rem;
+            color: var(--dim);
+            font-family: var(--mono);
+        }
 
-    /* ── CTA ── */
-    .cta-section {
-      text-align: center;
-      padding: 5rem clamp(1.5rem, 5vw, 4rem);
-      border-top: 1px solid var(--border);
-      position: relative; overflow: hidden;
-    }
-    .cta-section::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(167,139,250,.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .cta-section h2 {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 700; letter-spacing: -.025em;
-    }
-    .cta-section p { color: var(--text-dim); margin: 1rem auto 2rem; max-width: 460px; }
+        /* ─── Nav ─── */
+        nav {
+            border-bottom: 1px solid var(--border);
+            padding: .75rem 0;
+            display: flex;
+            gap: 1.5rem;
+        }
 
-    /* ── Footer ── */
-    footer {
-      text-align: center; padding: 2rem;
-      color: var(--muted); font-size: .8rem;
-      border-top: 1px solid var(--border);
-    }
-    footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--text-dim); }
+        nav a {
+            color: var(--dim);
+            text-decoration: none;
+            font-size: .875rem;
+        }
 
-    /* ── Animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+        nav a:hover {
+            color: var(--text);
+        }
 
-    /* ── Responsive nav ── */
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-    }
-  </style>
+        /* ─── Sections ─── */
+        section {
+            padding: 2.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        p+p {
+            margin-top: .75rem;
+        }
+
+        p {
+            color: var(--dim);
+        }
+
+        /* ─── Code blocks ─── */
+        pre {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            font-family: var(--mono);
+            font-size: .82rem;
+            line-height: 1.75;
+            color: #ccc;
+            margin-top: 1rem;
+        }
+
+        code {
+            font-family: var(--mono);
+            font-size: .85em;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: .1em .35em;
+            color: #ccc;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: inherit;
+        }
+
+        .cm {
+            color: #555;
+            font-style: italic;
+        }
+
+        .kw {
+            color: #7ab4f5;
+        }
+
+        .ty {
+            color: #e8a87c;
+        }
+
+        .st {
+            color: #98c379;
+        }
+
+        .nu {
+            color: #d19a66;
+        }
+
+        .hl {
+            color: var(--green);
+        }
+
+        /* ─── Feature list ─── */
+        ul.features {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .5rem 2rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 560px) {
+            ul.features {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ul.features li {
+            color: var(--dim);
+            font-size: .9rem;
+            padding-left: 1.1rem;
+            position: relative;
+        }
+
+        ul.features li::before {
+            content: '–';
+            position: absolute;
+            left: 0;
+            color: #444;
+        }
+
+        /* ─── Table ─── */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .88rem;
+        }
+
+        th {
+            text-align: left;
+            padding: .55rem .75rem;
+            color: var(--dim);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            font-size: .8rem;
+        }
+
+        td {
+            padding: .55rem .75rem;
+            border-bottom: 1px solid #1e1e1e;
+            color: var(--dim);
+        }
+
+        td:first-child {
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check {
+            color: var(--green);
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            padding-top: 2rem;
+            color: #555;
+            font-size: .8rem;
+        }
+
+        footer a {
+            color: #555;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--dim);
+        }
+    </style>
 </head>
+
 <body>
 
-<!-- Nav -->
-<nav>
-  <span class="nav-logo">ProtoMQ</span>
-  <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#how-it-works">How it works</a>
-    <a href="#performance">Performance</a>
-    <a href="https://github.com/electricalgorithm/protomq" class="nav-cta">GitHub ↗</a>
-  </div>
-</nav>
-
-<!-- Hero -->
-<header class="hero">
-  <div class="hero-badge"><span></span>Open Source · Written in Zig</div>
-  <h1>MQTT that <em>enforces</em> your schemas</h1>
-  <p class="hero-sub">
-    ProtoMQ is a high-performance MQTT broker that validates every message against a Protobuf schema —
-    at the broker layer, not in your client code.
-  </p>
-  <div class="hero-actions">
-    <a href="https://github.com/electricalgorithm/protomq" class="btn btn-primary">
-      View on GitHub
-    </a>
-    <a href="FAQ.html" class="btn btn-outline">Read the FAQ</a>
-  </div>
-</header>
-
-<!-- Stats -->
-<div class="stats">
-  <div class="stat">
-    <span class="stat-value">208k</span>
-    <span class="stat-label">msg/s peak throughput</span>
-  </div>
-  <div class="stat">
-    <span class="stat-value">0.44 ms</span>
-    <span class="stat-label">p99 latency · 100 clients</span>
-  </div>
-  <div class="stat">
-    <span class="stat-value">10,000</span>
-    <span class="stat-label">concurrent connections</span>
-  </div>
-  <div class="stat">
-    <span class="stat-value">2.6 MB</span>
-    <span class="stat-label">memory · 100 clients</span>
-  </div>
-  <div class="stat">
-    <span class="stat-value">0</span>
-    <span class="stat-label">memory leaks · 100k cycles</span>
-  </div>
-</div>
-
-<!-- Features -->
-<section id="features">
-  <span class="section-tag">Why ProtoMQ</span>
-  <h2 class="section-title">Schema enforcement that doesn't cost you anything</h2>
-  <p class="section-sub">Every feature has a purpose. Nothing is bolted on for marketing.</p>
-
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">🔒</div>
-      <div class="feature-title">Broker-layer validation</div>
-      <div class="feature-desc">Invalid Protobuf payloads are rejected before they reach any subscriber. No defensive parsing scattered across every client.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📡</div>
-      <div class="feature-title">Built-in service discovery</div>
-      <div class="feature-desc">Clients query <code>$SYS/discovery/request</code> to receive the full <code>.proto</code> source for every topic — zero out-of-band coordination.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <div class="feature-title">Runtime schema registration</div>
-      <div class="feature-desc">POST a new <code>.proto</code> to the Admin API and it is live instantly. No restart, no downtime, no redeployment.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🛠</div>
-      <div class="feature-title">First-class CLI</div>
-      <div class="feature-desc"><code>protomq-cli publish --json '{"temp":22.5}'</code> — the CLI encodes JSON into Protobuf automatically before sending.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <div class="feature-title">HTTP Admin API</div>
-      <div class="feature-desc">Live metrics, active schemas, and connection counts — available at <code>/metrics</code> and <code>/api/v1/schemas</code>.</div>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🪶</div>
-      <div class="feature-title">Zero-overhead when not needed</div>
-      <div class="feature-desc">The Admin Server is conditionally compiled with <code>-Dadmin_server=true</code>. When disabled, there is literally no code for it in the binary.</div>
-    </div>
-  </div>
-</section>
-
-<!-- How it works -->
-<section id="how-it-works">
-  <span class="section-tag">How it works</span>
-  <h2 class="section-title">From schema to running broker in minutes</h2>
-  <p class="section-sub">No config files, no plugins, no runtime dependencies.</p>
-
-  <div class="how-grid">
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h4>Define your schema</h4>
-          <p>Drop a standard <code>.proto</code> file into the <code>schemas/</code> directory. ProtoMQ parses it at startup — no code generation step required.</p>
+    <header>
+        <h1>ProtoMQ</h1>
+        <p>An MQTT 3.1.1 broker that validates and routes Protobuf messages at the network layer.
+            Written in Zig. MIT licensed.</p>
+        <div class="header-meta">
+            <a href="https://github.com/electricalgorithm/protomq" class="btn btn-primary">GitHub</a>
+            <a href="FAQ.html" class="btn btn-ghost">FAQ</a>
+            <span class="tag">v0.1.0-dev · Zig 0.15.2+</span>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h4>Map topics to message types</h4>
-          <p>Link a topic pattern to a message type with one line, either in source or via the Admin API at runtime.</p>
+    </header>
+
+    <nav>
+        <a href="#what">What it does</a>
+        <a href="#usage">Usage</a>
+        <a href="#admin">Admin API</a>
+        <a href="#performance">Performance</a>
+    </nav>
+
+    <!-- What it does -->
+    <section id="what">
+        <h2>What it does</h2>
+        <p>
+            Standard MQTT brokers are payload-agnostic — they forward bytes without knowing or caring what is inside.
+            ProtoMQ adds a schema layer on top: each topic is mapped to a Protobuf message type,
+            and the broker validates every incoming PUBLISH against that schema before routing it to subscribers.
+        </p>
+        <p>
+            Invalid payloads are dropped at the broker, so consumers never have to write defensive parsing code.
+            Schemas are plain <code>.proto</code> files — no code generation, no build step.
+        </p>
+
+        <ul class="features" style="margin-top:1.5rem">
+            <li>MQTT v3.1.1 (CONNECT, PUBLISH, SUBSCRIBE, …)</li>
+            <li>Runtime Protobuf parsing — no <code>protoc</code> required</li>
+            <li>Topic-to-schema mapping with wildcard support (<code>+</code>, <code>#</code>)</li>
+            <li>Built-in service discovery via <code>$SYS/discovery/request</code></li>
+            <li>CLI with JSON → Protobuf encoding</li>
+            <li>Optional HTTP Admin API (zero overhead when disabled)</li>
+            <li>Single binary, no runtime dependencies</li>
+            <li>QoS 0 · single-node · Linux &amp; macOS</li>
+        </ul>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage">
+        <h2>Usage</h2>
+
+        <p>Requires Zig 0.15.2 or later. Download from <a href="https://ziglang.org/download/"
+                style="color:var(--accent)">ziglang.org</a>.</p>
+
+        <pre><code><span class="cm"># Build</span>
+zig build -Doptimize=ReleaseSafe
+
+<span class="cm"># Run</span>
+./zig-out/bin/protomq-server
+
+<span class="cm"># CLI — publish with automatic JSON → Protobuf encoding</span>
+./zig-out/bin/protomq-cli publish -t sensor/data \
+  --json '{"device_id":"pi5","temperature":21.3,"humidity":55.0}'
+
+<span class="cm"># CLI — discover schemas from the running broker</span>
+./zig-out/bin/protomq-cli discover --proto-dir schemas</code></pre>
+
+        <p style="margin-top:1.25rem">
+            Drop <code>.proto</code> files into the <code>schemas/</code> directory. They are parsed on startup.
+            Map a topic to a message type in <code>src/server/tcp.zig</code>:
+        </p>
+
+        <pre><code><span class="cm">// src/server/tcp.zig — TcpServer.init()</span>
+<span class="kw">try</span> server.schema_manager.loadSchemasFromDir(<span class="st">"schemas"</span>);
+<span class="kw">try</span> server.schema_manager.mapTopicToSchema(<span class="st">"sensor/data"</span>, <span class="st">"SensorData"</span>);</code></pre>
+
+        <p style="margin-top:1rem">Then rebuild and restart. Or do it at runtime — see the Admin API section below.</p>
+    </section>
+
+    <!-- Admin API -->
+    <section id="admin">
+        <h2>Admin API</h2>
+
+        <p>
+            Build with <code>-Dadmin_server=true</code> to enable an HTTP server on <code>127.0.0.1:8080</code>.
+            When the flag is off, the HTTP code is entirely absent from the binary — not just disabled.
+        </p>
+
+        <pre><code>zig build -Doptimize=ReleaseSafe -Dadmin_server=true</code></pre>
+
+        <p style="margin-top:1.25rem">
+            All endpoints require <code>Authorization: Bearer &lt;ADMIN_TOKEN&gt;</code>
+            (env var, defaults to <code>admin_secret</code>).
+        </p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Path</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>GET</code></td>
+                        <td><code>/metrics</code></td>
+                        <td>Active connections, messages routed, loaded schema count</td>
+                    </tr>
+                    <tr>
+                        <td><code>GET</code></td>
+                        <td><code>/api/v1/schemas</code></td>
+                        <td>Current topic → message-type mappings as JSON</td>
+                    </tr>
+                    <tr>
+                        <td><code>POST</code></td>
+                        <td><code>/api/v1/schemas</code></td>
+                        <td>Register a new schema and mapping at runtime, no restart needed</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h4>Publish with any MQTT client</h4>
-          <p>Send a Protobuf-encoded payload over standard MQTT. The broker validates, routes, and forwards — any compliant MQTT 3.1.1 client works.</p>
+
+        <pre style="margin-top:1.25rem"><code><span class="cm"># Register a schema at runtime</span>
+curl -X POST http://127.0.0.1:8080/api/v1/schemas \
+  -H "Authorization: Bearer admin_secret" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "telemetry/gps",
+    "message_type": "GpsCoord",
+    "proto_file_content": "syntax = \"proto3\";\nmessage GpsCoord { float lat = 1; float lon = 2; }"
+  }'
+
+<span class="cm"># Check metrics</span>
+curl -s -H "Authorization: Bearer admin_secret" http://127.0.0.1:8080/metrics
+<span class="cm"># {"connections":3,"messages_routed":142,"schemas":2,"memory_mb":0}</span></code></pre>
+    </section>
+
+    <!-- Performance -->
+    <section id="performance">
+        <h2>Performance</h2>
+        <p>Benchmarked on two machines. Numbers are from the full benchmark suite in <code>benchmarks/</code>.</p>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Apple M2 Pro</th>
+                        <th>Raspberry Pi 5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>p99 latency · 100 clients</td>
+                        <td>0.44 ms</td>
+                        <td>0.13 ms</td>
+                    </tr>
+                    <tr>
+                        <td>Concurrent connections</td>
+                        <td>10,000</td>
+                        <td>10,000</td>
+                    </tr>
+                    <tr>
+                        <td>Sustained throughput</td>
+                        <td>9,000 msg/s</td>
+                        <td>9,000 msg/s</td>
+                    </tr>
+                    <tr>
+                        <td>Peak throughput (small msgs)</td>
+                        <td>208,000 msg/s</td>
+                        <td>147,000 msg/s</td>
+                    </tr>
+                    <tr>
+                        <td>Memory · 100 clients</td>
+                        <td>2.6 MB</td>
+                        <td>2.5 MB</td>
+                    </tr>
+                    <tr>
+                        <td>Memory leaks · 100k cycles</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h4>Bootstrap new clients automatically</h4>
-          <p>New subscribers query the discovery topic to receive the <code>.proto</code> source inline — no shared file-system or separate schema registry needed.</p>
-        </div>
-      </div>
-    </div>
 
-    <div class="code-block">
-      <div class="code-header">
-        <div class="code-dot dot-red"></div>
-        <div class="code-dot dot-amber"></div>
-        <div class="code-dot dot-green"></div>
-        <span class="code-filename">schemas/sensor.proto</span>
-      </div>
-      <pre><span class="kw">syntax</span> = <span class="st">"proto3"</span>;
-<span class="kw">package</span> iot.sensor;
+        <p style="margin-top:1rem">
+            Memory baseline increases from ~2.6 MB to ~4.0 MB when the Admin Server is compiled in.
+            The Admin Server shares the same event loop as the MQTT broker — it does not run on a separate thread.
+        </p>
+    </section>
 
-<span class="kw">message</span> <span class="ty">SensorData</span> {
-  <span class="kw">string</span>  device_id   = <span class="nu">1</span>;
-  <span class="kw">float</span>   temperature = <span class="nu">2</span>;
-  <span class="kw">float</span>   humidity    = <span class="nu">3</span>;
-  <span class="kw">uint64</span>  timestamp   = <span class="nu">4</span>;
-}</pre>
-      <div class="code-header" style="border-top:1px solid var(--border);border-bottom:none;">
-        <div class="code-dot dot-red"></div>
-        <div class="code-dot dot-amber"></div>
-        <div class="code-dot dot-green"></div>
-        <span class="code-filename">terminal</span>
-      </div>
-      <pre><span class="cm"># Publish — CLI encodes JSON → Protobuf</span>
-<span class="hl">$</span> protomq-cli publish \
-    -t sensor/data \
-    --json <span class="st">'{"device_id":"pi5","temperature":21.3}'</span>
-
-<span class="cm"># Bootstrap a new client</span>
-<span class="hl">$</span> protomq-cli discover --proto-dir schemas
-
-<span class="cm"># Register a schema at runtime (no restart)</span>
-<span class="hl">$</span> curl -X POST http://127.0.0.1:8080/api/v1/schemas \
-    -H <span class="st">"Authorization: Bearer $ADMIN_TOKEN"</span> \
-    -d <span class="st">'{"topic":"telemetry/gps","message_type":"GpsCoord","proto_file_content":"..."}'</span></pre>
-    </div>
-  </div>
-</section>
-
-<!-- Comparison -->
-<section>
-  <span class="section-tag">Compared to alternatives</span>
-  <h2 class="section-title">Plain MQTT + custom binary vs ProtoMQ</h2>
-  <p class="section-sub">Everything you were building yourself — already done.</p>
-
-  <div class="comparison-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Concern</th>
-          <th>Plain MQTT + hand-rolled binary</th>
-          <th>ProtoMQ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Schema definition</td>
-          <td>Ad-hoc, lives in docs or code comments</td>
-          <td><span class="check">✓</span> Canonical <code>.proto</code> files</td>
-        </tr>
-        <tr>
-          <td>Consumer bootstrap</td>
-          <td>Pre-shared files, out-of-band coordination</td>
-          <td><span class="check">✓</span> Built-in service discovery topic</td>
-        </tr>
-        <tr>
-          <td>Payload validation</td>
-          <td>Manual, silently fails on mismatch</td>
-          <td><span class="check">✓</span> Rejected at the broker before delivery</td>
-        </tr>
-        <tr>
-          <td>CLI tooling</td>
-          <td>Write your own encoder</td>
-          <td><span class="check">✓</span> <code>protomq-cli</code> with JSON → Protobuf</td>
-        </tr>
-        <tr>
-          <td>Runtime schema changes</td>
-          <td>Requires redeployment of all producers</td>
-          <td><span class="check">✓</span> HTTP Admin API, live with no restart</td>
-        </tr>
-        <tr>
-          <td>Observability</td>
-          <td>None built in</td>
-          <td><span class="check">✓</span> <code>/metrics</code> endpoint</td>
-        </tr>
-        <tr>
-          <td>Binary size overhead</td>
-          <td>Zero (you write it all)</td>
-          <td><span class="check">✓</span> ~2.6 MB memory baseline</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- Performance -->
-<section id="performance">
-  <span class="section-tag">Performance</span>
-  <h2 class="section-title">Runs fast everywhere — including the Pi</h2>
-  <p class="section-sub">Benchmarked against both high-end and severely resource-constrained hardware.</p>
-
-  <div class="comparison-wrap" style="margin-top:2.5rem">
-    <table>
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Apple M2 Pro</th>
-          <th>Raspberry Pi 5</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>p99 latency · 100 clients</td>
-          <td>0.44 ms</td>
-          <td>0.13 ms</td>
-        </tr>
-        <tr>
-          <td>Concurrent connections</td>
-          <td>10,000</td>
-          <td>10,000</td>
-        </tr>
-        <tr>
-          <td>Sustained throughput</td>
-          <td>9,000 msg/s</td>
-          <td>9,000 msg/s</td>
-        </tr>
-        <tr>
-          <td>Peak throughput (small msgs)</td>
-          <td>208,000 msg/s</td>
-          <td>147,000 msg/s</td>
-        </tr>
-        <tr>
-          <td>Memory · 100 clients</td>
-          <td>2.6 MB</td>
-          <td>2.5 MB</td>
-        </tr>
-        <tr>
-          <td>Memory leaks · 100k cycles</td>
-          <td>0</td>
-          <td>0</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- CTA -->
-<div class="cta-section">
-  <h2>Ready to stop writing encoders by hand?</h2>
-  <p>ProtoMQ is MIT-licensed, single-binary, and runs on Linux and macOS today.</p>
-  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-    <a href="https://github.com/electricalgorithm/protomq" class="btn btn-primary">Get started on GitHub</a>
-    <a href="FAQ.html" class="btn btn-outline">Read the FAQ</a>
-  </div>
-</div>
-
-<!-- Footer -->
-<footer>
-  <p>Built with <a href="https://ziglang.org/">Zig</a> · MIT License ·
-  <a href="https://github.com/electricalgorithm/protomq">github.com/electricalgorithm/protomq</a></p>
-</footer>
+    <footer>
+        <p>
+            MIT License ·
+            <a href="https://github.com/electricalgorithm/protomq">github.com/electricalgorithm/protomq</a> ·
+            <a href="FAQ.html">FAQ</a>
+        </p>
+    </footer>
 
 </body>
+
 </html>
