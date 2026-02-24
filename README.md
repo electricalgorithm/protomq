@@ -19,7 +19,7 @@
 
 ---
 
-ProtoMQ is an MQTT broker that enforces **Protobuf schemas at the broker level**. Clients publish JSON; the broker validates, encodes to Protobuf, and routes compact binary payloads to subscribers. No code generation, no `.proto` compilation step on the client side.
+ProtoMQ is an MQTT broker that enforces **Protobuf schemas at the broker level**. All messages on the wire are Protobuf — the broker validates incoming payloads against registered `.proto` schemas and rejects anything that doesn't conform. The bundled CLI can accept JSON and encode it to Protobuf client-side for convenience.
 
 <p align="center">
   <img src="assets/terminal_demo.svg" alt="ProtoMQ terminal demo" width="780px" />
@@ -44,14 +44,14 @@ A 12-field sensor reading weighs around 310 bytes in JSON. The same data in Prot
   <img src="assets/payload_comparison.svg" alt="JSON vs Protobuf payload size comparison" width="680px" />
 </p>
 
-But switching to Protobuf means you need code generation per language, keeping stubs in sync across firmware versions, and losing the ability to just read your payloads. ProtoMQ sits in the middle: producers send plain JSON, the broker handles encoding, and subscribers get compact Protobuf. The schema lives in one place and the broker enforces it.
+But switching to Protobuf usually means code generation per language, keeping stubs in sync across firmware versions, and losing the ability to just read your payloads. ProtoMQ takes a different approach: the broker owns the `.proto` schemas and validates every message against them. The CLI can accept JSON and encode it to Protobuf before publishing, so you get a human-friendly workflow without sacrificing wire efficiency.
 
 | | Plain MQTT + JSON | ProtoMQ |
 |---|---|---|
 | Schema enforcement | None — anything goes | Validated at every `PUBLISH` |
 | Payload format | JSON (~170 bytes, 8 fields) | Protobuf (~48 bytes) |
 | Client bootstrap | Pre-shared docs | Built-in Service Discovery |
-| Code generation | Required per language | Not needed |
+| Code generation | Required per language | CLI encodes JSON → Protobuf for you |
 
 ---
 
@@ -87,7 +87,7 @@ zig build run-server
 ```
 
 ```bash
-# In another terminal — publish a JSON message
+# In another terminal — publish (CLI encodes JSON to Protobuf for you)
 zig build run-client -- publish --topic sensors/temp \
   --json '{"device_id":"s-042","temperature":22.5,"humidity":61,"timestamp":1706140800}'
 
