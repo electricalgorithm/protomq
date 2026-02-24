@@ -1,0 +1,8 @@
+services:
+  protomq:
+    build: .
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./schemas:/opt/protomq/schemas:ro
+    restart: unless-stopped

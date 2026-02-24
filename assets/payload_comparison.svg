@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <style>
+    text { fill: #e6edf3; }
+    .title { font-size: 18px; font-weight: 700; }
+    .subtitle { font-size: 12px; fill: #8b949e; }
+    .label { font-size: 13px; font-weight: 600; }
+    .value { font-size: 13px; font-weight: 700; }
+    .axis-label { font-size: 11px; fill: #8b949e; }
+    .saving { font-size: 12px; font-weight: 700; fill: #3fb950; }
+    .note { font-size: 10.5px; fill: #8b949e; }
+  </style>
+
+  <!-- Background -->
+  <rect width="720" height="440" rx="12" fill="#0d1117"/>
+  <rect x="1" y="1" width="718" height="438" rx="11" fill="none" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="360" y="36" text-anchor="middle" class="title">Payload Size: JSON vs Protobuf</text>
+  <text x="360" y="54" text-anchor="middle" class="subtitle">Identical sensor telemetry data — fewer bytes = less bandwidth, lower latency</text>
+
+  <!-- ── Scenario 1: Small payload (SensorData, 4 fields) ── -->
+  <text x="55" y="100" class="label">SensorData</text>
+  <text x="55" y="115" class="axis-label">4 fields · device_id, temp, humidity, ts</text>
+
+  <!-- JSON bar -->
+  <text x="55" y="143" class="axis-label">JSON</text>
+  <rect x="110" y="130" width="265" height="22" rx="4" fill="#f97316" opacity="0.85"/>
+  <text x="385" y="146" class="value" fill="#f97316">114 bytes</text>
+
+  <!-- Protobuf bar -->
+  <text x="55" y="175" class="axis-label">Protobuf</text>
+  <rect x="110" y="162" width="93" height="22" rx="4" fill="#58a6ff" opacity="0.85"/>
+  <text x="213" y="178" class="value" fill="#58a6ff">40 bytes</text>
+  <text x="290" y="178" class="saving">▼ 65% smaller</text>
+
+  <!-- ── Scenario 2: Medium payload (8 fields) ── -->
+  <text x="55" y="220" class="label">SensorTelemetry</text>
+  <text x="55" y="235" class="axis-label">8 fields · device_id, temp, humidity, pressure, battery, lat, lon, ts</text>
+
+  <!-- JSON bar -->
+  <text x="55" y="263" class="axis-label">JSON</text>
+  <rect x="110" y="250" width="396" height="22" rx="4" fill="#f97316" opacity="0.85"/>
+  <text x="516" y="266" class="value" fill="#f97316">170 bytes</text>
+
+  <!-- Protobuf bar -->
+  <text x="55" y="295" class="axis-label">Protobuf</text>
+  <rect x="110" y="282" width="112" height="22" rx="4" fill="#58a6ff" opacity="0.85"/>
+  <text x="232" y="298" class="value" fill="#58a6ff">48 bytes</text>
+  <text x="310" y="298" class="saving">▼ 72% smaller</text>
+
+  <!-- ── Scenario 3: Large payload (fleet status, 12 fields) ── -->
+  <text x="55" y="340" class="label">FleetStatus</text>
+  <text x="55" y="355" class="axis-label">12 fields · id, coords, engine metrics, diagnostics, timestamp</text>
+
+  <!-- JSON bar -->
+  <text x="55" y="383" class="axis-label">JSON</text>
+  <rect x="110" y="370" width="530" height="22" rx="4" fill="#f97316" opacity="0.85"/>
+  <text x="650" y="386" class="value" fill="#f97316">310 bytes</text>
+
+  <!-- Protobuf bar -->
+  <text x="55" y="415" class="axis-label">Protobuf</text>
+  <rect x="110" y="402" width="140" height="22" rx="4" fill="#58a6ff" opacity="0.85"/>
+  <text x="260" y="418" class="value" fill="#58a6ff">82 bytes</text>
+  <text x="340" y="418" class="saving">▼ 74% smaller</text>
+
+  <!-- Legend -->
+  <rect x="528" y="88" width="12" height="12" rx="2" fill="#f97316" opacity="0.85"/>
+  <text x="546" y="99" class="axis-label">JSON (text)</text>
+  <rect x="528" y="106" width="12" height="12" rx="2" fill="#58a6ff" opacity="0.85"/>
+  <text x="546" y="117" class="axis-label">Protobuf (binary)</text>
+</svg>

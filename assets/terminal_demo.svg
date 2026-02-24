@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 480" font-family="'SF Mono', 'Fira Code', 'Cascadia Code', monospace">
+  <style>
+    .bg { fill: #0d1117; }
+    .frame { fill: none; stroke: #30363d; stroke-width: 1; }
+    .titlebar { fill: #161b22; }
+    .dot-r { fill: #ff5f57; }
+    .dot-y { fill: #febc2e; }
+    .dot-g { fill: #28c840; }
+    .tab { fill: #8b949e; font-size: 11px; }
+    .prompt { fill: #3fb950; font-size: 13px; }
+    .cmd { fill: #e6edf3; font-size: 13px; }
+    .output { fill: #8b949e; font-size: 12.5px; }
+    .highlight { fill: #58a6ff; font-size: 12.5px; }
+    .success { fill: #3fb950; font-size: 12.5px; }
+    .warn { fill: #d29922; font-size: 12.5px; }
+    .dim { fill: #484f58; font-size: 12.5px; }
+    .comment { fill: #6e7681; font-size: 12px; font-style: italic; }
+  </style>
+
+  <!-- Window frame -->
+  <rect width="820" height="480" rx="10" class="bg"/>
+  <rect x="0.5" y="0.5" width="819" height="479" rx="10" class="frame"/>
+
+  <!-- Title bar -->
+  <rect width="820" height="36" rx="10" class="titlebar"/>
+  <rect x="0" y="26" width="820" height="10" class="titlebar"/>
+  <circle cx="20" cy="18" r="6" class="dot-r"/>
+  <circle cx="40" cy="18" r="6" class="dot-y"/>
+  <circle cx="60" cy="18" r="6" class="dot-g"/>
+  <text x="410" y="22" text-anchor="middle" class="tab">protomq — zsh — 120×30</text>
+
+  <!-- Line 1: Start server -->
+  <text x="18" y="62" class="prompt">❯</text>
+  <text x="36" y="62" class="cmd">zig build run-server -- --proto-dir schemas</text>
+
+  <!-- Server output -->
+  <text x="18" y="82" class="success">[info]</text>
+  <text x="60" y="82" class="output">ProtoMQ v0.1.0 starting on 0.0.0.0:1883</text>
+  <text x="18" y="100" class="success">[info]</text>
+  <text x="60" y="100" class="output">Loaded schema: iot.sensor.SensorData (4 fields, 40 bytes max)</text>
+  <text x="18" y="118" class="success">[info]</text>
+  <text x="60" y="118" class="output">Mapped topic "sensors/#" → SensorData</text>
+  <text x="18" y="136" class="success">[info]</text>
+  <text x="60" y="136" class="output">Event loop ready (kqueue backend, 1000 max connections)</text>
+
+  <!-- Separator -->
+  <text x="18" y="166" class="dim">─────────────────────────────────── terminal 2 ──────────────────────────────────</text>
+
+  <!-- Line 2: Publish with CLI -->
+  <text x="18" y="192" class="comment"># Publish a JSON payload — ProtoMQ encodes it to Protobuf automatically</text>
+  <text x="18" y="212" class="prompt">❯</text>
+  <text x="36" y="212" class="cmd">protomq-cli publish --topic sensors/temp \</text>
+  <text x="56" y="230" class="cmd">--json '{"device_id":"s-042","temperature":22.5,"humidity":61,"timestamp":1706140800}'</text>
+
+  <!-- Publish output -->
+  <text x="18" y="254" class="highlight">[protobuf]</text>
+  <text x="95" y="254" class="output">Encoded 114-byte JSON → 28-byte Protobuf (75% reduction)</text>
+  <text x="18" y="272" class="success">[publish]</text>
+  <text x="95" y="272" class="output">sensors/temp → 1 subscriber(s), 28 bytes delivered</text>
+
+  <!-- Separator -->
+  <text x="18" y="302" class="dim">─────────────────────────────────── terminal 3 ──────────────────────────────────</text>
+
+  <!-- Line 3: Subscribe -->
+  <text x="18" y="328" class="comment"># Subscribe and see decoded messages in real time</text>
+  <text x="18" y="348" class="prompt">❯</text>
+  <text x="36" y="348" class="cmd">protomq-cli subscribe --topic "sensors/#"</text>
+
+  <!-- Subscribe output -->
+  <text x="18" y="372" class="warn">[sensors/temp]</text>
+  <text x="130" y="372" class="output">SensorData {</text>
+  <text x="130" y="390" class="output">  device_id: "s-042"</text>
+  <text x="130" y="408" class="output">  temperature: 22.5</text>
+  <text x="130" y="426" class="output">  humidity: 61</text>
+  <text x="130" y="444" class="output">  timestamp: 1706140800</text>
+  <text x="130" y="462" class="output">}</text>
+</svg>
