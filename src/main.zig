@@ -9,7 +9,7 @@ pub fn main() !void {
     const allocator = gpa.allocator();
 
     std.debug.print("ProtoMQ Server Starting...\n", .{});
-    std.debug.print("Version: 0.1.0\n", .{});
+    std.debug.print("Version: 0.2.0\n", .{});
     std.debug.print("Zig Version: {s}\n\n", .{@import("builtin").zig_version_string});
 
     // Create and start TCP server
